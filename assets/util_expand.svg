@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Expand navigation rail - chevrons pointing right -->
+  <!-- Left boundary line (collapsed nav rail) -->
+  <line stroke="#005EA2" stroke-width="1.5" x1="6" y1="4" x2="6" y2="20"/>
+  <!-- Double chevron pointing right (expand) -->
+  <path fill="none" stroke="#005EA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M 10 8 L 14 12 L 10 16"/>
+  <path fill="none" stroke="#005EA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M 14 8 L 18 12 L 14 16"/>
+</svg>

@@ -1,0 +1,122 @@
+table ga4-daily
+	lineageTag: 1e9f6eeb-0259-4c60-a838-a54c3c9ebc79
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0a9facf2-74d9-4d4d-9164-d15669a051c4
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Views
+		dataType: int64
+		formatString: 0
+		lineageTag: 50c60822-29f6-4128-bac7-d001439d5f50
+		summarizeBy: sum
+		sourceColumn: Views
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e748019-c61f-4651-990b-6b46eef0dba8
+		summarizeBy: sum
+		sourceColumn: Sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7752f3c9-02bf-4e99-ab4c-a0407d9627bc
+		summarizeBy: none
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Engaged sessions'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2216bbf5-0e6f-4f39-97bc-65b956c52cc2
+		summarizeBy: sum
+		sourceColumn: Engaged sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Engagement rate'
+		dataType: double
+		lineageTag: b7bdf3c0-f2a8-4482-adac-13b7e4913af8
+		summarizeBy: sum
+		sourceColumn: Engagement rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition ga4-daily = m
+		mode: import
+		source =
+				let
+				    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+				    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+				    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+				    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+				
+				    // Pull from GA4 cube
+				    #"Added Items" = Cube.Transform(#"properties/1",
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+				            {Cube.AddMeasureColumn, "screenPageViews", "screenPageViews"},
+				            {Cube.AddMeasureColumn, "sessions", "sessions"},
+				            {Cube.AddMeasureColumn, "totalUsers", "totalUsers"},
+				            {Cube.AddMeasureColumn, "engagedSessions", "engagedSessions"},
+				            {Cube.AddMeasureColumn, "engagementRate", "engagementRate"}
+				        }
+				    ),
+				
+				    // Rename early (optional, but keeps things readable)
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Items",{
+				        {"date", "Date"},
+				        {"screenPageViews", "Views"},
+				        {"sessions", "Sessions"},
+				        {"totalUsers", "Total users"},
+				        {"engagedSessions", "Engaged sessions"},
+				        {"engagementRate", "Engagement rate"}
+				    }),
+				
+				    // IMPORTANT: make Date extraction rollup-safe
+				    // If GA4 returns a non-date/rollup member, Date.From will fail; we turn it into null instead of crashing refresh.
+				    #"Date Safe" =
+				        Table.TransformColumns(
+				            #"Renamed Columns",
+				            {{"Date", each try Date.From(_) otherwise null, type date}}
+				        ),
+				
+				    // Drop any rows where Date couldn't be parsed (these are usually rollup/total members)
+				    #"Removed Non-Date Rows" =
+				        Table.SelectRows(#"Date Safe", each [Date] <> null),
+				
+				    // Filter to Secretary Kennedy term (Feb 13, 2025 and later)
+				    #"Filtered Kennedy Term" =
+				        Table.SelectRows(#"Removed Non-Date Rows", each [Date] >= #date(2025, 2, 13)),
+				
+				    // Now apply types safely (after filtering)
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Kennedy Term",{
+				        {"Views", Int64.Type},
+				        {"Sessions", Int64.Type},
+				        {"Total users", Int64.Type},
+				        {"Engaged sessions", Int64.Type},
+				        {"Engagement rate", type number}
+				    })
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

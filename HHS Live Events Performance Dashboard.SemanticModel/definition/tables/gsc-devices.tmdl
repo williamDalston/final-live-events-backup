@@ -1,0 +1,76 @@
+/// GSC devices - AGGREGATE TABLE (no date column, not date-filterable)
+table gsc-devices
+	lineageTag: 7b9c6b9f-7f39-4e8a-b96d-2113e5e87efd
+
+	column Device
+		dataType: string
+		lineageTag: 09b28f81-3a57-4db9-82fc-cc408f007260
+		summarizeBy: none
+		sourceColumn: Device
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clicks
+		dataType: int64
+		lineageTag: 6348eea4-e192-4e96-8b0b-f999115139ac
+		summarizeBy: none
+		sourceColumn: Clicks
+
+		annotation SummarizationSetBy = Automatic
+
+	column Impressions
+		dataType: int64
+		lineageTag: 473ba524-a005-474b-98b7-a0713590d1e7
+		summarizeBy: none
+		sourceColumn: Impressions
+
+		annotation SummarizationSetBy = Automatic
+
+	column CTR
+		dataType: double
+		isHidden
+		lineageTag: d694f5b2-5f3d-4f05-b117-6b8cd57e98ce
+		summarizeBy: sum
+		sourceColumn: CTR
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Position
+		dataType: double
+		lineageTag: e328d789-9cfb-44da-90b2-60723166e84c
+		summarizeBy: none
+		sourceColumn: Position
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gsc-devices = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(pDatasetsFolder & "gsc-devices.csv"),
+				        [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]
+				    ),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Cleaned Headers" = Table.TransformColumnNames(#"Promoted Headers", each Text.Trim(_)),
+				    #"Replaced Empty With Null" = Table.ReplaceValue(
+				        #"Cleaned Headers",
+				        "",
+				        null,
+				        Replacer.ReplaceValue,
+				        {"Clicks","Impressions","CTR","Position"}
+				    ),
+				    #"Transformed CTR" = Table.TransformColumns(#"Replaced Empty With Null", {{"CTR", each fxTransformCTR(_), type number}}),
+				    #"Changed Type" = Table.TransformColumnTypes(
+				        #"Transformed CTR",
+				        {{"Clicks", Int64.Type}, {"Impressions", Int64.Type}, {"Position", type number}, {"CTR", type number}}
+				    )
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

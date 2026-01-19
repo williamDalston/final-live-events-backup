@@ -1,0 +1,38 @@
+/// Geography dimension - stable reference for slicers
+table DimGeography
+	lineageTag: 22534f19-dde7-4687-8d84-b1010dab6388
+
+	column City
+		lineageTag: 2b007bc8-f756-4dcc-b096-d4c664817ea2
+		isNameInferred
+		sourceColumn: ga4-geography[City]
+
+	column Country
+		lineageTag: c32e793c-b5a4-48ff-9d4d-6430974d3174
+		isNameInferred
+		sourceColumn: ga4-geography[Country]
+
+	column Region
+		lineageTag: abe2b3f1-ddf4-4d23-87ac-a82c9cff6d21
+		isNameInferred
+		sourceColumn: ga4-geography[Region]
+
+	column GeoKey
+		isHidden
+		lineageTag: 2f8ee55d-e3f7-40a4-b364-a8f77bcf8cf9
+		isNameInferred
+		sourceColumn: [GeoKey]
+
+	/// Disambiguated location label for slicers and display
+	column GeoLabel = [City] & ", " & [Region] & ", " & [Country]
+		dataType: string
+		lineageTag: efc832a4-d385-4b04-b783-141c5da8c1d6
+
+	partition DimGeography = calculated
+		mode: import
+		source =
+				ADDCOLUMNS(
+				    SUMMARIZE('ga4-geography', 'ga4-geography'[City], 'ga4-geography'[Country], 'ga4-geography'[Region]),
+				    "GeoKey", 'ga4-geography'[City] & "|" & 'ga4-geography'[Country] & "|" & 'ga4-geography'[Region]
+				)
+

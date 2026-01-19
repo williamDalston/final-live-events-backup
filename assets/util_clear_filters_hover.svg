@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Hover state: Active erasing action -->
+  <!-- Filter funnel being erased - more faded -->
+  <path fill="none" stroke="#4A90E2" stroke-width="1.5" stroke-opacity="0.2" stroke-dasharray="2,2"
+        d="M 4 4 L 10 11 L 10 16"/>
+  <path fill="none" stroke="#4A90E2" stroke-width="1.5" stroke-opacity="0.2" stroke-dasharray="2,2"
+        d="M 16 4 L 10 11"/>
+  <!-- Eraser tool (tilted rectangle) - brighter -->
+  <rect fill="#4A90E2" x="12" y="14" width="8" height="4" rx="0.5"
+        transform="rotate(-30 16 16)"/>
+  <rect fill="#FFFFFF" fill-opacity="0.4" x="13" y="14.5" width="6" height="1"
+        transform="rotate(-30 16 16)"/>
+  <rect fill="#FFFFFF" fill-opacity="0.4" x="13" y="16.5" width="6" height="1"
+        transform="rotate(-30 16 16)"/>
+  <!-- Eraser debris (more particles, active clearing) -->
+  <circle fill="#4A90E2" fill-opacity="0.6" cx="11" cy="13" r="0.6"/>
+  <circle fill="#4A90E2" fill-opacity="0.6" cx="13" cy="12" r="0.5"/>
+  <circle fill="#4A90E2" fill-opacity="0.6" cx="10" cy="15" r="0.7"/>
+  <circle fill="#4A90E2" fill-opacity="0.5" cx="9" cy="14" r="0.5"/>
+  <circle fill="#4A90E2" fill-opacity="0.4" cx="12" cy="14" r="0.4"/>
+  <circle fill="#4A90E2" fill-opacity="0.4" cx="8" cy="13" r="0.4"/>
+  <!-- X mark for "clear" emphasis - brighter and larger -->
+  <path stroke="#4A90E2" stroke-width="2.5" stroke-linecap="round"
+        d="M 3 3 L 7 7 M 7 3 L 3 7"/>
+</svg>

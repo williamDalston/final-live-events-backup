@@ -1,0 +1,111 @@
+/// GA4 daily metrics by device category - enables date-filtered device analysis
+table ga4-daily-device
+	lineageTag: 5e6f00f9-68f9-43c6-b78b-2943ee2b85f8
+
+	column date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a1557232-1ecb-40c4-a0d7-9f025c1340f1
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column deviceCategory
+		dataType: string
+		lineageTag: 10cd7b16-b860-44e9-9967-99c8661d4b69
+		summarizeBy: none
+		sourceColumn: deviceCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: b71e52d9-e875-403b-bc36-1de3c46b7cb0
+		summarizeBy: sum
+		sourceColumn: sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column totalUsers
+		dataType: int64
+		formatString: 0
+		lineageTag: 330bb8b8-3200-46d6-bcb8-0c06709e030d
+		summarizeBy: sum
+		sourceColumn: totalUsers
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ga4-daily-device = m
+		mode: import
+		source =
+				let
+				    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+				    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+				    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+				    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+				
+				    #"Added Items" = Cube.Transform(#"properties/1",
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+				            {Cube.AddAndExpandDimensionColumn, "deviceCategory", {"deviceCategory"}, {"deviceCategory"}},
+				            {Cube.AddMeasureColumn, "sessions", "sessions"},
+				            {Cube.AddMeasureColumn, "totalUsers", "totalUsers"}
+				        }
+				    ),
+				
+				    // 1) Make Date safe and real
+				    #"Date Safe" =
+				        Table.TransformColumns(
+				            #"Added Items",
+				            {{"date", each try Date.From(_) otherwise null, type date}}
+				        ),
+				    #"Removed Non-Date Rows" = Table.SelectRows(#"Date Safe", each [date] <> null),
+				
+				    // 2) Filter early (Kennedy term + optionally keep it small to stabilize)
+				    #"Filtered Kennedy Term" = Table.SelectRows(#"Removed Non-Date Rows", each [date] >= #date(2025, 2, 13)),
+				
+				    // OPTIONAL: keep it small while stabilizing (uncomment if needed)
+				    // #"Last 28 Days" =
+				    //     Table.SelectRows(
+				    //         #"Filtered Kennedy Term",
+				    //         each [date] >= Date.AddDays(Date.From(DateTime.LocalNow()), -28)
+				    //     ),
+				
+				    // 3) Make deviceCategory safe text
+				    #"Device Safe" =
+				        Table.TransformColumns(
+				            #"Filtered Kennedy Term",
+				            {{"deviceCategory", each try Text.From(_) otherwise null, type text}}
+				        ),
+				
+				    // 4) Remove rollup rows explicitly (the "(other)" culprit)
+				    #"Removed Rollups" =
+				        Table.SelectRows(
+				            #"Device Safe",
+				            each [deviceCategory] <> null and Text.Lower(Text.Trim([deviceCategory])) <> "(other)"
+				        ),
+				
+				    // 5) Types last
+				    #"Changed Type" =
+				        Table.TransformColumnTypes(
+				            #"Removed Rollups",
+				            {
+				                {"sessions", Int64.Type},
+				                {"totalUsers", Int64.Type},
+				                {"deviceCategory", type text},
+				                {"date", type date}
+				            }
+				        ),
+				
+				    #"Sorted Rows" = Table.Sort(#"Changed Type", {{"date", Order.Descending}})
+				in
+				    #"Sorted Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

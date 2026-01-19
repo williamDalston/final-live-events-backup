@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Hover state: Expanding to fullscreen -->
+  <!-- Corner brackets (expand to full) - brighter -->
+  <!-- Top-left -->
+  <path fill="none" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"
+        d="M 3 9 L 3 3 L 9 3"/>
+  <!-- Top-right -->
+  <path fill="none" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"
+        d="M 15 3 L 21 3 L 21 9"/>
+  <!-- Bottom-left -->
+  <path fill="none" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"
+        d="M 3 15 L 3 21 L 9 21"/>
+  <!-- Bottom-right -->
+  <path fill="none" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"
+        d="M 15 21 L 21 21 L 21 15"/>
+  <!-- Expansion lines (animated feel) -->
+  <line stroke="#4A90E2" stroke-width="0.8" stroke-opacity="0.3" x1="7" y1="12" x2="3" y2="12"/>
+  <line stroke="#4A90E2" stroke-width="0.8" stroke-opacity="0.3" x1="12" y1="7" x2="12" y2="3"/>
+  <line stroke="#4A90E2" stroke-width="0.8" stroke-opacity="0.3" x1="17" y1="12" x2="21" y2="12"/>
+  <line stroke="#4A90E2" stroke-width="0.8" stroke-opacity="0.3" x1="12" y1="17" x2="12" y2="21"/>
+  <!-- Center focus dot - larger -->
+  <circle fill="#4A90E2" cx="12" cy="12" r="1.3"/>
+</svg>

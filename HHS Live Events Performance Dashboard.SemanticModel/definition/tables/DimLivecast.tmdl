@@ -1,0 +1,66 @@
+/// Livecast dimension
+table DimLivecast
+	lineageTag: 1002e0a2-33e7-4b83-8cf3-317e1e29a9e8
+
+	column 'Livecast Title'
+		lineageTag: da5d6c1e-987a-47f2-af7a-755da6228c71
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Livecast Title]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Key column
+	column livecast_title
+		isHidden
+		lineageTag: 3ee0a7a4-02ce-4475-af20-639b5c1a9734
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [livecast_title]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Clean livecast title for display (removes | HHS.gov and bracket IDs)
+	column 'Livecast Title (Clean)' =
+			VAR FullTitle = 'DimLivecast'[Livecast Title]
+			VAR PipePos = SEARCH(" | ", FullTitle, 1, 0)
+			VAR BracketPos = SEARCH("[", FullTitle, 1, 0)
+			VAR AfterPipe = IF(PipePos > 0, LEFT(FullTitle, PipePos - 1), FullTitle)
+			RETURN IF(BracketPos > 0, LEFT(AfterPipe, BracketPos - 1), AfterPipe)
+		dataType: string
+		lineageTag: d350e415-4339-4c3c-88da-6322cbd0d624
+
+	partition DimLivecast = calculated
+		mode: import
+		source = ```
+				VAR TitlesFromPages = 
+				    SELECTCOLUMNS(
+				        FILTER(
+				            SUMMARIZE(
+				                FILTER('ga4-pages', [Is Live Event] && [Is Actual Livecast]),
+				                [Page Title (Clean)]
+				            ),
+				            [Page Title (Clean)] <> "" &&
+				            NOT CONTAINSSTRING([Page Title (Clean)], "Search Results")
+				        ),
+				        "livecast_title", [Page Title (Clean)]
+				    )
+				VAR TitlesFromEvents = 
+				    SELECTCOLUMNS(
+				        FILTER(
+				            SUMMARIZE('ga4-titles', [Page Title (Clean)]),
+				            [Page Title (Clean)] <> "" &&
+				            [Page Title (Clean)] <> "| HHS.gov" &&
+				            [Page Title (Clean)] <> "HHS.gov"
+				        ),
+				        "livecast_title", [Page Title (Clean)]
+				    )
+				VAR AllTitles = DISTINCT(UNION(TitlesFromPages, TitlesFromEvents))
+				RETURN
+				    SELECTCOLUMNS(
+				        AllTitles,
+				        "livecast_title", [livecast_title],
+				        "Livecast Title", [livecast_title]
+				    )
+				```
+

@@ -1,0 +1,127 @@
+/// GA4 events - AGGREGATE TABLE (no date column, standalone reference)
+table ga4-events
+	lineageTag: 93b1089a-6dcc-4b36-87d6-0ee94cb46eed
+
+	column 'Event name'
+		dataType: string
+		lineageTag: c9c8ecc2-6833-46ac-b158-2b824aae10bf
+		summarizeBy: none
+		sourceColumn: Event name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event count'
+		dataType: int64
+		formatString: 0
+		lineageTag: e98ac742-96d3-4df9-abc0-c01dc8eb3c82
+		summarizeBy: sum
+		sourceColumn: Event count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1e438295-9394-47aa-8086-1c756601ddc5
+		summarizeBy: sum
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event count per active user'
+		dataType: double
+		lineageTag: 565085e2-1c42-4e43-ac13-7587354baa99
+		summarizeBy: sum
+		sourceColumn: Event count per active user
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column1
+		dataType: string
+		lineageTag: a9ae3c33-cc6a-4cbe-b690-1e72cc1d1b0b
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ga4-events = m
+		mode: import
+		source =
+				let
+				    // Base load - inline to avoid cyclic reference
+				    FilePath = pDatasetsFolder & "ga4-events.csv",
+				    RawSource = Csv.Document(File.Contents(FilePath), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    SkippedMeta = Table.Skip(RawSource, 6),
+				    Source = Table.PromoteHeaders(SkippedMeta, [PromoteAllScalars=true]),
+				
+				    // Clean Event name
+				    #"Trimmed Event Name" =
+				        Table.TransformColumns(
+				            Source,
+				            {{"Event name", each if _ = null then null else Text.Trim(Text.From(_)), type text}}
+				        ),
+				
+				    // Filter out empty event names
+				    #"Filtered Event Name" =
+				        Table.SelectRows(
+				            #"Trimmed Event Name",
+				            each [Event name] <> null and [Event name] <> ""
+				        ),
+				
+				    // Convert numeric text safely (handles commas, blanks, bad values)
+				    #"Converted Numbers" =
+				        Table.TransformColumns(
+				            #"Filtered Event Name",
+				            {
+				                {
+				                    "Event count",
+				                    (x) =>
+				                        let
+				                            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in
+				                            n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Total users",
+				                    (x) =>
+				                        let
+				                            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in
+				                            n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Event count per active user",
+				                    (x) =>
+				                        let
+				                            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in
+				                            n,
+				                    type number
+				                }
+				            }
+				        ),
+				
+				    // Remove the extra trailing column if it exists (GA4 often adds it)
+				    #"Removed Column1" = Table.RemoveColumns(#"Converted Numbers", {"Column1"}, MissingField.Ignore),
+				
+				    // Optional: keep a clean column order
+				    #"Reordered Columns" =
+				        Table.ReorderColumns(
+				            #"Removed Column1",
+				            {"Event name", "Event count", "Total users", "Event count per active user"},
+				            MissingField.Ignore
+				        )
+				in
+				    #"Reordered Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

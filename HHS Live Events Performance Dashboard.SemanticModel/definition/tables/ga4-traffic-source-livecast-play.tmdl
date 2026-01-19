@@ -1,0 +1,85 @@
+/// GA4 traffic (play events)
+table ga4-traffic-source-livecast-play
+	lineageTag: d0f7a9aa-ac97-4545-b98a-84134020169b
+
+	column 'Traffic Source'
+		dataType: string
+		lineageTag: d5e3b7d6-ee8a-4b16-9cb0-b7fe50dc57cc
+		summarizeBy: none
+		sourceColumn: Traffic Source
+
+		annotation SummarizationSetBy = Automatic
+
+	column Medium
+		dataType: string
+		lineageTag: 528460c5-d59e-420f-9dcb-fdc03a5aed14
+		summarizeBy: none
+		sourceColumn: Medium
+
+		annotation SummarizationSetBy = Automatic
+
+	column Metric
+		dataType: string
+		lineageTag: 8066be6a-751e-41b6-97c2-a64382f4e17e
+		summarizeBy: none
+		sourceColumn: Metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: cd33c64a-ffca-4c8b-bec9-9d9603d3ad0c
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition ga4-traffic-source-livecast-play = m
+		mode: import
+		source = ```
+				let
+				    Source = Csv.Document(File.Contents(pDatasetsFolder & "ga4-traffic-source-livecast-play.csv"),[Delimiter=",", Columns=12, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    
+				    // 1. Skip metadata rows
+				    #"Removed Top Rows" = Table.Skip(Source,6),
+				    
+				    // 2. Stitch "Medium" and "Metric" together
+				    TransposeForHeader = Table.Transpose(#"Removed Top Rows"),
+				    FillMedium = Table.FillDown(TransposeForHeader, {"Column1"}),
+				    MergeHeaders = Table.CombineColumns(FillMedium, {"Column1", "Column2"}, 
+				        Combiner.CombineTextByDelimiter("_", QuoteStyle.None), "CombinedHeader"),
+				    
+				    // 3. Flip back and promote the new stitched headers
+				    TransposeBack = Table.Transpose(MergeHeaders),
+				    PromoteFinalHeaders = Table.PromoteHeaders(TransposeBack, [PromoteAllScalars=true]),
+				    
+				    // 4. Dynamically identify the first column (Session source)
+				    FirstCol = Table.ColumnNames(PromoteFinalHeaders){0},
+				    
+				    // 5. Unpivot everything EXCEPT the first column
+				    UnpivotData = Table.UnpivotOtherColumns(PromoteFinalHeaders, {FirstCol}, "Attribute", "Value"),
+				    
+				    // 6. Split Attribute back into Medium and Metric
+				    SplitHeader = Table.SplitColumn(UnpivotData, "Attribute", 
+				        Splitter.SplitTextByDelimiter("_", QuoteStyle.None), {"Medium", "Metric"}),
+				
+				    // 7. CRITICAL CLEANUP: Remove the summary row (Row 9) and any nulls
+				    // This removes the row that contains the total sum (7223 in your screenshot)
+				    CleanData = Table.SelectRows(SplitHeader, each 
+				        (Record.Field(_, FirstCol) <> "" and Record.Field(_, FirstCol) <> null) and
+				        ([Medium] <> "Session medium")
+				    ),
+				    
+				    // 8. Rename first column and set proper data types (including decimals)
+				    RenameFirstCol = Table.RenameColumns(CleanData, {{FirstCol, "Traffic Source"}}),
+				    FinalTypes = Table.TransformColumnTypes(RenameFirstCol, {{"Value", type number}, {"Traffic Source", type text}, {"Medium", type text}, {"Metric", type text}})
+				in
+				    FinalTypes
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

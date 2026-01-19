@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "HHS Live Events Performance Dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "af98c40f-43e2-48e2-a310-e3f0d7b2956b"
+  }
+}

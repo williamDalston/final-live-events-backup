@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Active state: Currently on Explorer page - filled with accent bar -->
+  <!-- Radar circles - filled -->
+  <circle fill="none" stroke="#4A90E2" stroke-width="1.8" cx="12" cy="12" r="9"/>
+  <circle fill="none" stroke="#4A90E2" stroke-width="1.2" cx="12" cy="12" r="6"/>
+  <circle fill="none" stroke="#4A90E2" stroke-width="1.2" cx="12" cy="12" r="3"/>
+  <!-- Center dot - filled -->
+  <circle fill="#4A90E2" cx="12" cy="12" r="2"/>
+  <!-- Radar sweep arm - thicker -->
+  <line stroke="#4A90E2" stroke-width="2" stroke-linecap="round" x1="12" y1="12" x2="18" y2="8"/>
+  <!-- Data points - filled and larger -->
+  <circle fill="#4A90E2" cx="16" cy="7" r="1.5"/>
+  <circle fill="#4A90E2" cx="19" cy="13" r="1.2"/>
+  <circle fill="#4A90E2" cx="8" cy="6" r="1.2"/>
+  <!-- Crosshair marks -->
+  <line stroke="#4A90E2" stroke-width="1.2" x1="12" y1="2" x2="12" y2="4"/>
+  <line stroke="#4A90E2" stroke-width="1.2" x1="12" y1="20" x2="12" y2="22"/>
+  <line stroke="#4A90E2" stroke-width="1.2" x1="2" y1="12" x2="4" y2="12"/>
+  <line stroke="#4A90E2" stroke-width="1.2" x1="20" y1="12" x2="22" y2="12"/>
+  <!-- Active indicator (vertical accent bar) -->
+  <rect fill="#4A90E2" x="0" y="0" width="3" height="24"/>
+</svg>

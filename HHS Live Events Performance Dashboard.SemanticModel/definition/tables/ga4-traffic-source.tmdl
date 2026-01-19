@@ -1,0 +1,93 @@
+/// GA4 traffic sources
+table ga4-traffic-source
+	lineageTag: 96240f39-64fe-4f96-9294-dca03aebc97a
+
+	column 'Traffic Source'
+		dataType: string
+		lineageTag: d1e26758-fa43-48bb-bd95-6616a3a50737
+		summarizeBy: none
+		sourceColumn: Traffic Source
+
+		annotation SummarizationSetBy = Automatic
+
+	column Medium
+		dataType: string
+		lineageTag: a3d02684-daaa-485a-bc28-09f4704efa8d
+		summarizeBy: none
+		sourceColumn: Medium
+
+		annotation SummarizationSetBy = Automatic
+
+	column Metric
+		dataType: string
+		lineageTag: bb17f15b-573b-4596-badd-b87464fcc52a
+		summarizeBy: none
+		sourceColumn: Metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: c964eb05-3b99-4251-8611-bdd78f907453
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Composite key for source dimension
+	column SourceKey = 'ga4-traffic-source'[Traffic Source] & "|" & 'ga4-traffic-source'[Medium]
+		dataType: string
+		isHidden
+		lineageTag: 891c68fa-b3fc-4f8b-84be-5a65007f9e88
+
+	partition ga4-traffic-source = m
+		mode: import
+		source = ```
+				let
+				    Source = Csv.Document(File.Contents(pDatasetsFolder & "ga4-traffic-source.csv"),[Delimiter=",", Columns=12, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    
+				    // 1. Skip the first 6 metadata rows
+				    #"Removed Top Rows" = Table.Skip(Source,6),
+				    
+				    // 2. Stitch the "Medium" (Row 7) and "Metric" (Row 8) together
+				    TransposeForHeader = Table.Transpose(#"Removed Top Rows"),
+				    FillMedium = Table.FillDown(TransposeForHeader, {"Column1"}),
+				    MergeHeaders = Table.CombineColumns(FillMedium, {"Column1", "Column2"}, 
+				        Combiner.CombineTextByDelimiter("_", QuoteStyle.None), "CombinedHeader"),
+				    
+				    // 3. Flip back and promote the new combined headers
+				    TransposeBack = Table.Transpose(MergeHeaders),
+				    PromoteFinalHeaders = Table.PromoteHeaders(TransposeBack, [PromoteAllScalars=true]),
+				    
+				    // 4. Dynamically identify the first column (Session source)
+				    FirstCol = Table.ColumnNames(PromoteFinalHeaders){0},
+				    
+				    // 5. Unpivot everything EXCEPT the first column
+				    UnpivotData = Table.UnpivotOtherColumns(PromoteFinalHeaders, {FirstCol}, "Attribute", "Value"),
+				    
+				    // 6. Split Attribute back into Medium and Metric
+				    SplitHeader = Table.SplitColumn(UnpivotData, "Attribute", 
+				        Splitter.SplitTextByDelimiter("_", QuoteStyle.None), {"Medium", "Metric"}),
+				
+				    // 7. CRITICAL CLEANUP: Remove the summary rows and nulls
+				    // This removes the row that says "(none)" or has no source name
+				    CleanData = Table.SelectRows(SplitHeader, each 
+				        (Record.Field(_, FirstCol) <> "" and Record.Field(_, FirstCol) <> null) and
+				        ([Medium] <> "Session medium")
+				    ),
+				    
+				    // 8. Rename first column for clarity
+				    RenameFirstCol = Table.RenameColumns(CleanData, {{FirstCol, "Traffic Source"}}),
+				    
+				    // 9. Set Data Types (handling the decimal Engagement Rate)
+				    FinalTypes = Table.TransformColumnTypes(RenameFirstCol, {{"Value", type number}, {"Traffic Source", type text}, {"Medium", type text}, {"Metric", type text}})
+				in
+				    FinalTypes
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,80 @@
+/// GSC daily metrics
+table gsc-chart
+	lineageTag: f6b096df-b106-4fbf-b577-78b70e92f916
+
+	column Clicks
+		dataType: int64
+		lineageTag: 7f229823-79be-4d44-9ea9-99aa50cc86d8
+		summarizeBy: sum
+		sourceColumn: Clicks
+
+		annotation SummarizationSetBy = Automatic
+
+	column Impressions
+		dataType: int64
+		lineageTag: 95a0b594-a7f9-4bca-bca1-3252f2b7ca42
+		summarizeBy: sum
+		sourceColumn: Impressions
+
+		annotation SummarizationSetBy = Automatic
+
+	column CTR
+		dataType: double
+		isHidden
+		lineageTag: 90019421-588f-4d59-9023-ce503cb598bd
+		summarizeBy: sum
+		sourceColumn: CTR
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Position
+		dataType: double
+		lineageTag: 60f5e9e3-f81c-4f2a-8f05-5dc0fb7a6f40
+		summarizeBy: sum
+		sourceColumn: Position
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9ad361f6-125c-46e1-8b89-1d71ecfc86b5
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition gsc-chart = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(pDatasetsFolder & "gsc-chart.csv"),
+				        [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]
+				    ),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Cleaned Headers" = Table.TransformColumnNames(#"Promoted Headers", each Text.Trim(_)),
+				    #"Replaced Empty With Null" = Table.ReplaceValue(
+				        #"Cleaned Headers",
+				        "",
+				        null,
+				        Replacer.ReplaceValue,
+				        {"Date","Clicks","Impressions","CTR","Position"}
+				    ),
+				    #"Changed Type - Date" = Table.TransformColumnTypes(#"Replaced Empty With Null", {{"Date", type date}}),
+				    #"Transformed CTR" = Table.TransformColumns(#"Changed Type - Date", {{"CTR", each fxTransformCTR(_), type number}}),
+				    #"Changed Type - Numbers" = Table.TransformColumnTypes(
+				        #"Transformed CTR",
+				        {{"Clicks", Int64.Type}, {"Impressions", Int64.Type}, {"Position", type number}, {"CTR", type number}}
+				    )
+				in
+				    #"Changed Type - Numbers"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Full screen / focus mode icon -->
+  <!-- Corner brackets (expand to full) -->
+  <!-- Top-left -->
+  <path fill="none" stroke="#005EA2" stroke-width="1.8" stroke-linecap="round"
+        d="M 3 9 L 3 3 L 9 3"/>
+  <!-- Top-right -->
+  <path fill="none" stroke="#005EA2" stroke-width="1.8" stroke-linecap="round"
+        d="M 15 3 L 21 3 L 21 9"/>
+  <!-- Bottom-left -->
+  <path fill="none" stroke="#005EA2" stroke-width="1.8" stroke-linecap="round"
+        d="M 3 15 L 3 21 L 9 21"/>
+  <!-- Bottom-right -->
+  <path fill="none" stroke="#005EA2" stroke-width="1.8" stroke-linecap="round"
+        d="M 15 21 L 21 21 L 21 15"/>
+  <!-- Center focus dot -->
+  <circle fill="#005EA2" cx="12" cy="12" r="1"/>
+</svg>

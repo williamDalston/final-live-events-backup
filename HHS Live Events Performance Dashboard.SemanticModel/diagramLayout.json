@@ -1,0 +1,318 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 852,
+            "y": 11842.956218004227
+          },
+          "nodeIndex": "DimDate",
+          "nodeLineageTag": "788be708-f92d-429a-a3d7-e3ea8714fdae",
+          "size": {
+            "height": 263,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 1136,
+            "y": 11890.956218004227
+          },
+          "nodeIndex": "DimLivecast",
+          "nodeLineageTag": "1002e0a2-33e7-4b83-8cf3-317e1e29a9e8",
+          "size": {
+            "height": 158,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 1420,
+            "y": 11890.956218004227
+          },
+          "nodeIndex": "DimAction",
+          "nodeLineageTag": "f8d63870-4c4c-442c-ba5d-f2465030d32a",
+          "size": {
+            "height": 333,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 1704,
+            "y": 11854.956218004227
+          },
+          "nodeIndex": "Measures_Livecast",
+          "size": {
+            "height": 453,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3458,
+            "y": 11766.612468004227
+          },
+          "nodeIndex": "ga4-events",
+          "nodeLineageTag": "3ee58a5d-bb3a-42e4-af87-16e49d68c6a8",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3742,
+            "y": 11666.862468004227
+          },
+          "nodeIndex": "ga4-geography-livecast-play",
+          "nodeLineageTag": "f5ed38e6-db83-4949-90fb-527e8b6c24b1",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4026,
+            "y": 11567.526530504227
+          },
+          "nodeIndex": "ga4-tech",
+          "nodeLineageTag": "4e376892-9510-45f5-9426-9007545c7924",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4310,
+            "y": 11544.253093004227
+          },
+          "nodeIndex": "ga4-traffic-source",
+          "nodeLineageTag": "fb093ed1-3d74-4972-a6cf-5af4657ddfa4",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4594,
+            "y": 11379.145671129227
+          },
+          "nodeIndex": "ga4-devices",
+          "nodeLineageTag": "d8966429-5d67-42be-8667-4e60c9b66165",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4878,
+            "y": 11232.219889879227
+          },
+          "nodeIndex": "ga4-geography",
+          "nodeLineageTag": "46fa2d22-ab80-4ec4-8a97-2ec13554778f",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5162,
+            "y": 11038.017253160477
+          },
+          "nodeIndex": "ga4-pages",
+          "nodeLineageTag": "e5da4315-dd95-4f74-a1e3-5c4112ba297a",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5446,
+            "y": 10891.083171129227
+          },
+          "nodeIndex": "ga4-titles",
+          "nodeLineageTag": "13ffea8d-7a14-43c8-aee7-8565ebfc7351",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5730,
+            "y": 10635.598429918289
+          },
+          "nodeIndex": "ga4-traffic-source-livecast-play",
+          "nodeLineageTag": "1ce10543-80a6-48ba-b644-03e3325d8b62",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5162,
+            "y": 10313.380168199539
+          },
+          "nodeIndex": "gsc-chart",
+          "nodeLineageTag": "f6b096df-b106-4fbf-b577-78b70e92f916",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5446,
+            "y": 10313.380168199539
+          },
+          "nodeIndex": "gsc-countries",
+          "nodeLineageTag": "407a57a5-6998-411d-8ee3-6aea5c2d50b7",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5730,
+            "y": 10313.380168199539
+          },
+          "nodeIndex": "gsc-devices",
+          "nodeLineageTag": "7b9c6b9f-7f39-4e8a-b96d-2113e5e87efd",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6298,
+            "y": 10313.380168199539
+          },
+          "nodeIndex": "gsc-pages",
+          "nodeLineageTag": "90d6deac-7c3a-431a-82e8-8b8267838db3",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6582,
+            "y": 10313.380168199539
+          },
+          "nodeIndex": "gsc-queries",
+          "nodeLineageTag": "1c131df9-3735-451c-8acd-8355137457bb",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6866,
+            "y": 10313.380168199539
+          },
+          "nodeIndex": "gsc-search-appearance",
+          "nodeLineageTag": "e89079ec-71f3-4664-92af-7262babc6c7c",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6298,
+            "y": 9502.6467087268829
+          },
+          "nodeIndex": "Recommended Actions",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6298,
+            "y": 8946.98033452034
+          },
+          "nodeIndex": "Action Catalog",
+          "nodeLineageTag": "7d5c3f66-8abe-4dc7-af43-b963a5101951",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6298,
+            "y": 5851.0474970340729
+          },
+          "nodeIndex": "ga4-daily",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6298,
+            "y": 5090.8035261631012
+          },
+          "nodeIndex": "ga4-daily-device",
+          "nodeLineageTag": "72238a5c-136d-4464-87da-04bff721ac4d",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 10,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

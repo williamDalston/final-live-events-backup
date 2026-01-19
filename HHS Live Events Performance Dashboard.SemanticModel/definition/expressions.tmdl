@@ -1,0 +1,322 @@
+expression pDatasetsFolder = "C:\Users\farad\Dev\WORK\HHS\repos\auto-the-big-one\dashboards\01_Live_Events_Dashboard\datasets\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 5965e2d9-1bad-436a-a52a-1991c7feb48d
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression fxTransformCTR =
+		let
+		    fxTransformCTR = (v as any) as nullable number =>
+		        let
+		            out =
+		                if v = null then
+		                    null
+		                else if Value.Is(v, type number) then
+		                    if v <= 1 then v else v / 100
+		                else
+		                    let
+		                        t  = Text.Trim(Text.From(v)),
+		                        t1 = Text.Replace(Text.Replace(t, "%", ""), ",", ""),
+		                        n0 = try Number.FromText(t1) otherwise null,
+		                        n  = if n0 = null then null else if n0 <= 1 then n0 else n0 / 100
+		                    in
+		                        n
+		        in
+		            out
+		in
+		    fxTransformCTR
+	lineageTag: 8fc119d7-f456-4d18-94bc-e123e86aeceb
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression 'Daily Traffic' =
+		let
+		    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+		    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+		    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+		    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+		    #"Added Items" = Cube.Transform(#"properties/1",
+		        {
+		            {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+		            {Cube.AddAndExpandDimensionColumn, "deviceCategory", {"deviceCategory"}, {"deviceCategory"}},
+		            {Cube.AddAndExpandDimensionColumn, "sessionMedium", {"sessionMedium"}, {"sessionMedium"}},
+		            {Cube.AddAndExpandDimensionColumn, "sessionSource", {"sessionSource"}, {"sessionSource"}},
+		            {Cube.AddMeasureColumn, "averageSessionDuration", "averageSessionDuration"},
+		            {Cube.AddMeasureColumn, "engagedSessions", "engagedSessions"},
+		            {Cube.AddMeasureColumn, "engagementRate", "engagementRate"},
+		            {Cube.AddMeasureColumn, "screenPageViews", "screenPageViews"},
+		            {Cube.AddMeasureColumn, "sessions", "sessions"},
+		            {Cube.AddMeasureColumn, "totalUsers", "totalUsers"}
+		        })
+		in
+		    #"Added Items"
+	lineageTag: 2b3d40a1-f563-4304-ad7f-4cb50309bacc
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression Events =
+		let
+		    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+		    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+		    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+		    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+		    #"Added Items" = Cube.Transform(#"properties/1",
+		        {
+		            {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+		            {Cube.AddAndExpandDimensionColumn, "eventName", {"eventName"}, {"eventName"}},
+		            {Cube.AddMeasureColumn, "eventCount", "eventCount"},
+		            {Cube.AddMeasureColumn, "totalUsers", "totalUsers"}
+		        })
+		in
+		    #"Added Items"
+	lineageTag: fbc4087a-f131-4c58-a4bf-1deb67507c3f
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Daily Pages' =
+		let
+		    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+		    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+		    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+		    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+		
+		    #"Added Items" = Cube.Transform(#"properties/1",
+		        {
+		            {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+		            {Cube.AddAndExpandDimensionColumn, "pagePath", {"pagePath"}, {"pagePath"}},
+		            {Cube.AddAndExpandDimensionColumn, "pageTitle", {"pageTitle"}, {"pageTitle"}},
+		            {Cube.AddMeasureColumn, "screenPageViews", "screenPageViews"},
+		            {Cube.AddMeasureColumn, "sessions", "sessions"}
+		        }
+		    ),
+		
+		    // Date safe
+		    #"Date Safe" =
+		        Table.TransformColumns(
+		            #"Added Items",
+		            {{"date", each try Date.From(_) otherwise null, type date}}
+		        ),
+		    #"Removed Non-Date Rows" = Table.SelectRows(#"Date Safe", each [date] <> null),
+		
+		    // Filter early (Kennedy term)
+		    #"Filtered Kennedy Term" =
+		        Table.SelectRows(#"Removed Non-Date Rows", each [date] >= #date(2025, 2, 13)),
+		
+		    // Dimension safe
+		    #"Dims Safe" =
+		        Table.TransformColumns(
+		            #"Filtered Kennedy Term",
+		            {
+		                {"pagePath", each try Text.From(_) otherwise null, type text},
+		                {"pageTitle", each try Text.From(_) otherwise null, type text}
+		            }
+		        ),
+		    #"Replaced Errors" = Table.ReplaceErrorValues(#"Dims Safe", {{"pagePath", "(other)"}}),
+		    #"Replaced Errors1" = Table.ReplaceErrorValues(#"Replaced Errors", {{"pageTitle", "(other)"}})
+		in
+		    #"Replaced Errors1"
+	lineageTag: e79223f8-f029-4195-8365-aad14bdb2f92
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// GA4 technology
+expression ga4-tech = ```
+		let
+		    Source = Csv.Document(File.Contents(pDatasetsFolder & "ga4-tech.csv"),[Delimiter=",", Columns=12, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    
+		    // 1. Skip metadata
+		    #"Removed Top Rows" = Table.Skip(Source,6),
+		    
+		    // 2. Stitch headers
+		    TransposeForHeader = Table.Transpose(#"Removed Top Rows"),
+		    FillDevice = Table.FillDown(TransposeForHeader, {"Column1"}),
+		    MergeHeaders = Table.CombineColumns(FillDevice, {"Column1", "Column2"}, 
+		        Combiner.CombineTextByDelimiter("_", QuoteStyle.None), "CombinedHeader"),
+		    
+		    // 3. Flip back and promote
+		    TransposeBack = Table.Transpose(MergeHeaders),
+		    PromoteFinalHeaders = Table.PromoteHeaders(TransposeBack, [PromoteAllScalars=true]),
+		    
+		    // 4. Identify the Browser column
+		    FirstCol = Table.ColumnNames(PromoteFinalHeaders){0},
+		    
+		    // 5. Unpivot Metrics
+		    UnpivotData = Table.UnpivotOtherColumns(PromoteFinalHeaders, {FirstCol}, "Attribute", "Value"),
+		    
+		    // 6. Split Device from Metric
+		    SplitHeader = Table.SplitColumn(UnpivotData, "Attribute", 
+		        Splitter.SplitTextByDelimiter("_", QuoteStyle.None), {"Device", "Metric"}),
+		
+		    // 7. THE FIX: Remove "Totals", "Grand total", and any row where Browser or Device is null
+		    CleanData = Table.SelectRows(SplitHeader, each 
+		        ([Device] <> "Totals" and [Device] <> "" and [Device] <> null) and 
+		        ([Metric] <> "Grand total" and [Metric] <> "" and [Metric] <> null) and 
+		        (Record.Field(_, FirstCol) <> "" and Record.Field(_, FirstCol) <> null)
+		    ),
+		    
+		    // 8. Final Polish
+		    RenameFirstCol = Table.RenameColumns(CleanData, {{FirstCol, "Browser"}}),
+		    FinalTypes = Table.TransformColumnTypes(RenameFirstCol, {{"Value", Int64.Type}, {"Browser", type text}, {"Device", type text}, {"Metric", type text}}),
+		    #"Capitalized Each Word" = Table.TransformColumns(FinalTypes,{{"Device", Text.Proper, type text}})
+		in
+		    #"Capitalized Each Word"
+		```
+	lineageTag: d9530b93-6af2-4684-b0ff-93e6509aca0f
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// GA4 daily metrics
+expression 'ga4-daily orig' =
+		let
+		    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+		    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+		    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+		    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+		    #"Added Items" = Cube.Transform(#"properties/1",
+		        {
+		            {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+		            {Cube.AddMeasureColumn, "screenPageViews", "screenPageViews"},
+		            {Cube.AddMeasureColumn, "sessions", "sessions"},
+		            {Cube.AddMeasureColumn, "totalUsers", "totalUsers"},
+		            {Cube.AddMeasureColumn, "engagedSessions", "engagedSessions"},
+		            {Cube.AddMeasureColumn, "engagementRate", "engagementRate"}
+		        }),
+		    #"Renamed Columns" = Table.RenameColumns(#"Added Items",{
+		        {"date", "Date"},
+		        {"screenPageViews", "Views"},
+		        {"sessions", "Sessions"},
+		        {"totalUsers", "Total users"},
+		        {"engagedSessions", "Engaged sessions"},
+		        {"engagementRate", "Engagement rate"}
+		    }),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{
+		        {"Date", type date},
+		        {"Views", Int64.Type},
+		        {"Sessions", Int64.Type},
+		        {"Total users", Int64.Type},
+		        {"Engaged sessions", Int64.Type},
+		        {"Engagement rate", type number}
+		    })
+		in
+		    #"Changed Type"
+	lineageTag: 671f5db9-0119-4df9-9fdc-064ed676cbea
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression ga4-daily-country =
+		let
+		    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+		    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+		    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+		    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+		
+		    #"Added Items" = Cube.Transform(#"properties/1",
+		        {
+		            {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+		            {Cube.AddAndExpandDimensionColumn, "country", {"country"}, {"country"}},
+		            {Cube.AddMeasureColumn, "sessions", "sessions"},
+		            {Cube.AddMeasureColumn, "totalUsers", "totalUsers"}
+		        }
+		    ),
+		
+		    #"Renamed Columns" = Table.RenameColumns(#"Added Items",{
+		        {"date", "Date"},
+		        {"country", "Country"},
+		        {"sessions", "Sessions"},
+		        {"totalUsers", "Total users"}
+		    }),
+		
+		    #"Date Safe" =
+		        Table.TransformColumns(
+		            #"Renamed Columns",
+		            {{"Date", each try Date.From(_) otherwise null, type date}}
+		        ),
+		    #"Removed Non-Date Rows" = Table.SelectRows(#"Date Safe", each [Date] <> null),
+		
+		    #"Country Safe" =
+		        Table.TransformColumns(
+		            #"Removed Non-Date Rows",
+		            {{"Country", each try Text.From(_) otherwise "(other)", type text}}
+		        ),
+		
+		    #"Filtered Kennedy Term" =
+		        Table.SelectRows(#"Country Safe", each [Date] >= #date(2025, 2, 13)),
+		
+		    // Optional: hide rollup rows
+		    // #"Removed (other)" = Table.SelectRows(#"Filtered Kennedy Term", each [Country] <> "(other)"),
+		
+		    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Kennedy Term",{
+		        {"Sessions", Int64.Type},
+		        {"Total users", Int64.Type}
+		    }),
+		    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"Date", Order.Descending}}),
+		    #"Removed Blank Rows" = Table.SelectRows(#"Sorted Rows", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+		    #"Replaced Errors" = Table.ReplaceErrorValues(#"Removed Blank Rows", {{"Country", "(other)"}}),
+		    #"Removed Blank Rows1" = Table.SelectRows(#"Replaced Errors", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null})))
+		in
+		    #"Removed Blank Rows1"
+	lineageTag: ffc359fb-8b93-4870-a9ea-17f5566d34ad
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+
+expression ga4-daily-source =
+		let
+		    Source = GoogleAnalytics.Accounts([Implementation="2.0"]),
+		    #"accounts/36351725" = Source{[Id="accounts/36351725"]}[Data],
+		    #"properties/268438943" = #"accounts/36351725"{[Id="properties/268438943"]}[Data],
+		    #"properties/1" = #"properties/268438943"{[Id="properties/268438943"]}[Data],
+		
+		    #"Added Items" =
+		        Cube.Transform(
+		            #"properties/1",
+		            {
+		                {Cube.AddAndExpandDimensionColumn, "date", {"date"}, {"date"}},
+		                {Cube.AddAndExpandDimensionColumn, "sessionDefaultChannelGroup", {"sessionDefaultChannelGroup"}, {"Channel Group"}},
+		                {Cube.AddMeasureColumn, "sessions", "sessions"},
+		                {Cube.AddMeasureColumn, "totalUsers", "totalUsers"}
+		            }
+		        ),
+		
+		    #"Date Safe" = Table.TransformColumns(#"Added Items", {{"date", each try Date.From(_) otherwise null, type date}}),
+		    #"Removed Non-Date Rows" = Table.SelectRows(#"Date Safe", each [date] <> null),
+		
+		    #"Filtered Kennedy Term" = Table.SelectRows(#"Removed Non-Date Rows", each [date] >= #date(2025, 2, 13)),
+		    #"Last 28 Days" = Table.SelectRows(#"Filtered Kennedy Term", each [date] >= Date.AddDays(Date.From(DateTime.LocalNow()), -28)),
+		
+		    #"Channel Safe" =
+		        Table.TransformColumns(
+		            #"Last 28 Days",
+		            {{"Channel Group", each try Text.From(_) otherwise null, type text}}
+		        ),
+		    #"Removed Null Channels" = Table.SelectRows(#"Channel Safe", each [Channel Group] <> null and Text.Trim([Channel Group]) <> ""),
+		
+		    #"Changed Type" =
+		        Table.TransformColumnTypes(
+		            #"Removed Null Channels",
+		            {{"date", type date}, {"sessions", Int64.Type}, {"totalUsers", Int64.Type}}
+		        ),
+		
+		    #"Sorted Rows" = Table.Sort(#"Changed Type", {{"date", Order.Descending}, {"sessions", Order.Descending}})
+		in
+		    #"Sorted Rows"
+	lineageTag: 98bfa22d-3b30-4ca7-b49d-0db68220ce62
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

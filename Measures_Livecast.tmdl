@@ -1,0 +1,2311 @@
+table Measures_Livecast
+	lineageTag: ef5a3bce-8893-47bb-a604-2a0767459dda
+
+	/// Total livecast events
+	measure 'Total Events' = SUM('ga4-events'[Event count])
+		formatString: 0
+		displayFolder: 02 - Video Performance
+		lineageTag: 13ce1474-6209-4742-a879-38591c602c8c
+
+	/// Unique video viewers
+	measure 'Unique Viewers' = SUM('ga4-daily'[Total users])
+		formatString: 0
+		displayFolder: 02 - Video Performance
+		lineageTag: e1e81598-b5b7-432d-8533-fb9b7d195aa7
+
+	/// Total watch time (minutes)
+	measure 'Total Engagement (Minutes)' =
+			SUMX(
+			    'ga4-pages',
+			    'ga4-pages'[Average engagement time per session] * 'ga4-pages'[Sessions]
+			) / 60
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: e0619d15-aa91-40b0-9d60-3a6335fd1ee1
+
+	/// Total watch time (hours)
+	measure 'Total Engagement (Hours)' = DIVIDE([Total Engagement (Minutes)], 60, 0)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: 2a08d870-3fa7-48b3-8e7b-3d5091dd1a8f
+
+	/// Avg watch time per viewer
+	measure 'Avg Engagement per Viewer (Minutes)' =
+			DIVIDE(
+			    [Total Engagement (Minutes)],
+			    [Unique Viewers],
+			    0
+			)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: d815f408-d78a-427b-9969-ca79916dbaff
+
+	/// Return event count
+	measure 'Return Events' = CALCULATE([Total Events], 'ga4-events'[Event name] = "return")
+		formatString: 0
+		displayFolder: 02 - Video Performance
+		lineageTag: 78cfb3cb-f5b6-40ae-a9a1-49ccc6c41bb0
+
+	/// Returning viewers count
+	measure 'Return Viewers' = CALCULATE([Unique Viewers], 'ga4-events'[Event name] = "return")
+		formatString: 0
+		displayFolder: 02 - Video Performance
+		lineageTag: ef810475-0284-4b2e-a67b-5b35b2414ce1
+
+	/// Viewer return rate
+	measure 'Return Rate' =
+			DIVIDE(
+			    [Return Viewers],
+			    [Unique Viewers],
+			    0
+			)
+		formatString: 0.0%
+		displayFolder: 02 - Video Performance
+		lineageTag: 4f21790f-d613-4376-b109-08e74a444b1e
+
+	/// Events per viewer
+	measure 'Events per Viewer' =
+			DIVIDE(
+			    [Total Events],
+			    [Unique Viewers],
+			    0
+			)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: b118263b-b45b-47a2-bb23-44ad7b4cbe02
+
+	/// Count of distinct livecasts
+	measure 'Active Livecasts' = DISTINCTCOUNT('ga4-titles'[Page title])
+		formatString: 0
+		displayFolder: 02 - Video Performance
+		lineageTag: e95eeb8c-1c12-4d8d-84e5-5457f2496941
+
+	/// Avg viewers per livecast
+	measure 'Viewers per Livecast' =
+			DIVIDE(
+			    [Unique Viewers],
+			    [Active Livecasts],
+			    0
+			)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: 44db0673-d625-4372-a332-a0e8a409a3d3
+
+	/// Last update timestamp
+	measure 'Last Updated Text' = "Data current through " & FORMAT(CALCULATE(MAX('ga4-daily'[Date]), ALL('ga4-daily')), "MMMM dd, yyyy")
+		formatString: @
+		displayFolder: 99 - Utility
+		lineageTag: ee26e1d2-6b2c-486b-bb86-78956197fbe9
+
+	/// Sessions by city (livecast events)
+	measure 'Sessions by City' = SUM('ga4-geography-livecast-play'[Sessions])
+		formatString: #,##0
+		displayFolder: 04 - Geography
+		lineageTag: 257c4242-17e2-4bbe-99e7-fc4e02e9aa71
+
+	/// Users by city (livecast events)
+	measure 'Users by City' = SUM('ga4-geography-livecast-play'[Total users])
+		formatString: #,##0
+		displayFolder: 04 - Geography
+		lineageTag: 7b85b8d6-efaa-4760-bfe8-f580fe1cc66b
+
+	/// Returning viewers by city
+	measure 'Returning Viewers (City)' = SUM('ga4-geography'[Total users])
+		formatString: #,##0
+		displayFolder: 04 - Geography
+		lineageTag: 5e2785aa-2de5-478d-85eb-69f899b89ca6
+
+	/// Return rate by city
+	measure 'Return Rate (City)' = DIVIDE([Returning Viewers (City)], [Sessions by City], 0)
+		formatString: 0.0%
+		displayFolder: 04 - Geography
+		lineageTag: 94dc183b-9862-4758-a4da-9c604e706dc9
+
+	/// Avg engagement by city
+	measure 'Avg Engagement Minutes (City)' = [Avg Engagement per Viewer (Minutes)]
+		formatString: #,##0.0
+		displayFolder: 04 - Geography
+		lineageTag: 3e4dba7f-5327-45df-adda-209f935ccba5
+
+	/// Count of unique cities
+	measure 'City Count' = DISTINCTCOUNT('ga4-geography-livecast-play'[City])
+		formatString: #,##0
+		displayFolder: 04 - Geography
+		lineageTag: 467e41eb-b466-4dea-b498-fdd2bb3fbcb6
+
+	/// City's share of total sessions
+	measure 'City Share %' = DIVIDE([Sessions by City], CALCULATE([Sessions by City], ALL('ga4-geography-livecast-play'[City])), 0)
+		formatString: 0.0%
+		displayFolder: 04 - Geography
+		lineageTag: d57a0216-975f-4f37-9140-73c2edcf8c0d
+
+	/// City ranking by sessions
+	measure 'City Rank' = RANKX(ALL('ga4-geography-livecast-play'[City]), [Sessions by City], , DESC)
+		formatString: #,##0
+		displayFolder: 04 - Geography
+		lineageTag: 0839b411-65c8-4b05-a7dd-e2bf2212a9a4
+
+	/// Avg engagement minutes
+	measure 'Avg Engagement (Mins)' = AVERAGEX(VALUES('ga4-titles'[Page title]), [Avg Engagement per Viewer (Minutes)])
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: fbd4f432-aae9-4827-afd5-583bda431e7f
+
+	/// Estimated retention %
+	measure 'Est Retention %' = DIVIDE([Avg Engagement (Mins)], 45, 0)
+		formatString: 0.0%
+		displayFolder: 02 - Video Performance
+		lineageTag: 4949e514-5347-415d-a5d1-54c791be7d10
+
+	/// Selected livecast label
+	measure 'Label - Latest Event' =
+			VAR SelectedTitle = SELECTEDVALUE(DimLivecast[Livecast Title])
+			VAR LatestTitle = CALCULATE(MAX('ga4-titles'[Page title]), 'ga4-daily'[Date] = MAX('ga4-daily'[Date]))
+			RETURN
+			"Showing data for: " &
+			    COALESCE(SelectedTitle, LatestTitle, "All Live Events")
+		formatString: @
+		displayFolder: 99 - Utility
+		lineageTag: d4f0a929-5313-4846-98ee-55a8eb3fb34b
+
+	/// Selected city label
+	measure 'Label - Latest City' =
+			VAR SelectedCity = SELECTEDVALUE('ga4-geography-livecast-play'[City])
+			RETURN
+			"Showing data for: " &
+			    COALESCE(SelectedCity, "All Cities")
+		formatString: @
+		displayFolder: 04 - Geography
+		lineageTag: bc31d777-a57e-49ca-bacc-af8ea8167fe9
+
+	/// Avg viewers per cast
+	measure 'Avg Viewers per Cast' = DIVIDE([Unique Viewers], [Active Livecasts], 0)
+		formatString: 0
+		displayFolder: 02 - Video Performance
+		lineageTag: 6465efba-bdd6-4d70-995a-ef7fe2298108
+
+	/// Event row count
+	measure 'Row Count - Fact_LivecastEvents' = SUM('ga4-events'[Event count])
+		formatString: #,##0
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: 98293c88-3ca0-4915-9ea1-6a6a53e23afa
+
+	/// Date row count
+	measure 'Row Count - DimDate' = COUNTROWS(DimDate)
+		formatString: #,##0
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: 27bab7ad-cb82-48df-827d-fa1325ede076
+
+	/// Livecast row count
+	measure 'Row Count - DimLivecast' = COUNTROWS(DimLivecast)
+		formatString: #,##0
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: 1b8bc21f-4047-482f-a243-316fd84ecce1
+
+	/// Action row count
+	measure 'Row Count - DimAction' = COUNTROWS(DimAction)
+		formatString: #,##0
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: 8ad1c5eb-af7f-4f4f-ba4a-33181fcd8284
+
+	/// Total sessions (responds to Livecast filter)
+	measure Sessions = SUM('ga4-pages'[Sessions])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: bd08ce4e-fb4f-4552-a6cf-4e36502e30bf
+
+	/// Total page views (responds to Livecast filter)
+	measure 'Page Views' = SUM('ga4-pages'[Views])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: a61ce675-f047-4dce-834b-80178e787c89
+
+	/// Total video play clicks (user clicked play button)
+	measure 'Video Plays' = CALCULATE([Total Events], 'ga4-events'[Event name] = "livecast_play")
+		formatString: #,##0
+		displayFolder: 02 - Video Performance
+		lineageTag: d5726ad2-0659-47cb-bb53-02ffbaed965a
+
+	/// Total unique users (responds to Livecast filter)
+	measure 'Total Users' = SUM('ga4-pages'[Total users])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: 9921a709-1590-4b15-9d41-7497976e03d2
+
+	/// New users (N/A)
+	measure 'New Users' = BLANK()
+		formatString: #,##0
+		isHidden
+		displayFolder: 01 - KPI Cards
+		lineageTag: 92f8b4c7-9a91-46f4-9d77-bb2c9041cdd8
+
+	/// Returning users
+	measure 'Returning Users' = [Return Viewers]
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: 929262a4-43c8-4732-adb5-f63d64f27b73
+
+	/// Overall engagement rate
+	measure 'Engagement Rate' = DIVIDE(SUM('ga4-daily'[Engaged sessions]), SUM('ga4-daily'[Sessions]), 0)
+		formatString: 0.0%
+		displayFolder: 07 - Engagement
+		lineageTag: a6ddcc05-b103-47a5-85db-b8cd19c0173a
+
+	/// Engagement rate by page
+	measure 'Engagement Rate by Page' =
+			VAR PageViewsValue = [Page Views]
+			VAR EngagementMinutes = [Total Engagement (Minutes)]
+			RETURN
+			IF(
+			    NOT(ISBLANK(PageViewsValue)) && PageViewsValue > 0,
+			    DIVIDE(
+			        EngagementMinutes,
+			        PageViewsValue,
+			        0
+			    ),
+			    BLANK()
+			)
+		formatString: 0.0%
+		displayFolder: 07 - Engagement
+		lineageTag: 7b84dd2f-9721-4850-98a2-a07f6a796ae0
+
+	/// Avg views per event
+	measure 'Avg Views per Event' =
+			VAR TotalEvents = [Total Events]
+			VAR ActiveLivecasts = [Active Livecasts]
+			RETURN
+			IF(
+			    NOT(ISBLANK(ActiveLivecasts)) && ActiveLivecasts > 0,
+			    DIVIDE(
+			        TotalEvents,
+			        ActiveLivecasts,
+			        0
+			    ),
+			    BLANK()
+			)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: a1b922f6-37d8-4378-9503-70a9a3ec40d1
+
+	/// Avg viewers per event
+	measure 'Avg Viewers per Event' =
+			VAR UniqueViewers = [Unique Viewers]
+			VAR ActiveLivecasts = [Active Livecasts]
+			RETURN
+			IF(
+			    NOT(ISBLANK(ActiveLivecasts)) && ActiveLivecasts > 0,
+			    DIVIDE(
+			        UniqueViewers,
+			        ActiveLivecasts,
+			        0
+			    ),
+			    BLANK()
+			)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: 4d85f5bd-02d0-4c55-ab71-14076d695309
+
+	/// Avg sessions per event
+	measure 'Avg Sessions per Event' =
+			VAR SessionsValue = [Sessions]
+			VAR ActiveLivecasts = [Active Livecasts]
+			RETURN
+			IF(
+			    NOT(ISBLANK(ActiveLivecasts)) && ActiveLivecasts > 0 && NOT(ISBLANK(SessionsValue)) && SessionsValue > 0,
+			    DIVIDE(
+			        SessionsValue,
+			        ActiveLivecasts,
+			        0
+			    ),
+			    BLANK()
+			)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: f5f6f416-7855-4cfc-9fa1-76503bb9133d
+
+	/// Viewership trend component (25%)
+	measure Health_ViewershipTrend = ```
+			VAR UniqueViewers = [Unique Viewers]
+			VAR PrevMonthViewers = CALCULATE([Unique Viewers], DATEADD(DimDate[Date], -1, MONTH))
+			VAR MoMPct = 
+			    IF(
+			        OR(ISBLANK(UniqueViewers), ISBLANK(PrevMonthViewers)) || UniqueViewers <= 0 || PrevMonthViewers <= 0,
+			        0,
+			        DIVIDE(UniqueViewers - PrevMonthViewers, PrevMonthViewers, 0)
+			    )
+			RETURN
+			    IF(MoMPct <= -0.20, 0,
+			        IF(MoMPct >= 0.20, 1,
+			            DIVIDE(MoMPct + 0.20, 0.40, 0)
+			        )
+			    ) * 0.25
+			```
+		formatString: 0.00
+		displayFolder: 09 - Health Score\Components
+		lineageTag: 1ae8a1a1-8740-4a2c-aec5-c01f3f4ed86a
+
+	/// Engagement component (25%)
+	measure Health_EngagementRate =
+			VAR Rate = [Engagement Rate]
+			RETURN
+			    IF(ISBLANK(Rate), 0,
+			        IF(Rate <= 0.30, 0,
+			            IF(Rate >= 0.80, 1,
+			                DIVIDE(Rate - 0.30, 0.50, 0)
+			            )
+			        )
+			    ) * 0.25
+		formatString: 0.00
+		displayFolder: 09 - Health Score\Components
+		lineageTag: 32c1edfe-1848-4229-8ece-0dc11e6dd52f
+
+	/// Completion component (20%)
+	measure Health_CompletionRate =
+			VAR Rate = [Engagement Rate]
+			RETURN
+			    IF(ISBLANK(Rate), 0,
+			        IF(Rate <= 0.20, 0,
+			            IF(Rate >= 0.75, 1,
+			                DIVIDE(Rate - 0.20, 0.55, 0)
+			            )
+			        )
+			    ) * 0.20
+		formatString: 0.00
+		displayFolder: 09 - Health Score\Components
+		lineageTag: 07a893ce-ed0d-473e-8c5f-a2f6b9e94cdc
+
+	/// Growth component (15%)
+	measure Health_GrowthBenchmark = ```
+			VAR UniqueViewers = [Unique Viewers]
+			VAR PrevYearViewers = CALCULATE([Unique Viewers], SAMEPERIODLASTYEAR(DimDate[Date]))
+			VAR YoYPct = 
+			    IF(
+			        OR(ISBLANK(UniqueViewers), ISBLANK(PrevYearViewers)) || UniqueViewers <= 0 || PrevYearViewers <= 0,
+			        0,
+			        DIVIDE(UniqueViewers - PrevYearViewers, PrevYearViewers, 0)
+			    )
+			RETURN
+			    IF(YoYPct <= -0.10, 0,
+			        IF(YoYPct >= 0.15, 1,
+			            DIVIDE(YoYPct + 0.10, 0.25, 0)
+			        )
+			    ) * 0.15
+			```
+		formatString: 0.00
+		displayFolder: 09 - Health Score\Components
+		lineageTag: b714d866-aa7f-4b94-99cc-415975a642d2
+
+	/// Retention component (15%)
+	measure Health_Retention =
+			VAR Rate = [Return Rate]
+			RETURN
+			    IF(ISBLANK(Rate), 0,
+			        IF(Rate <= 0.05, 0,
+			            IF(Rate >= 0.25, 1,
+			                DIVIDE(Rate - 0.05, 0.20, 0)
+			            )
+			        )
+			    ) * 0.15
+		formatString: 0.00
+		displayFolder: 09 - Health Score\Components
+		lineageTag: 9858a949-1b4a-40e3-ace2-f4c8b5c82aa8
+
+	/// Program Health Score (0-100)
+	measure 'Health Score' = ```
+			VAR Score = 
+			    IF(ISBLANK([Health_ViewershipTrend]), 0, [Health_ViewershipTrend]) +
+			    IF(ISBLANK([Health_EngagementRate]), 0, [Health_EngagementRate]) +
+			    IF(ISBLANK([Health_CompletionRate]), 0, [Health_CompletionRate]) +
+			    IF(ISBLANK([Health_GrowthBenchmark]), 0, [Health_GrowthBenchmark]) +
+			    IF(ISBLANK([Health_Retention]), 0, [Health_Retention])
+			RETURN Score * 100
+			```
+		formatString: #,##0
+		displayFolder: 09 - Health Score
+		lineageTag: 72538a76-815b-4e60-a132-e9f2bf805d6b
+
+	/// Letter grade (A+ to F)
+	measure 'Health Score Grade' =
+			VAR Score = DIVIDE([Health Score], 100, 0)
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    Score >= 0.90, "A+",
+			    Score >= 0.85, "A",
+			    Score >= 0.80, "A-",
+			    Score >= 0.75, "B+",
+			    Score >= 0.70, "B",
+			    Score >= 0.65, "B-",
+			    Score >= 0.60, "C+",
+			    Score >= 0.55, "C",
+			    Score >= 0.50, "D",
+			    "F"
+			)
+		formatString: @
+		displayFolder: 09 - Health Score
+		lineageTag: b95a3e60-8343-4330-88d3-80abd2bf7f88
+
+	/// Top event type
+	measure 'Top Event Type' = ```
+			VAR TopType = 
+			    TOPN(
+			        1,
+			        VALUES(DimLivecast[livecast_title]),
+			        [Total Events],
+			        DESC
+			    )
+			RETURN
+			IF(
+			    COUNTROWS(TopType) = 1,
+			    MAXX(TopType, DimLivecast[livecast_title]),
+			    "Multiple"
+			)
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights
+		lineageTag: 72e275fe-44a3-4e90-81d0-0a6b0f172875
+
+	/// Best engagement day
+	measure 'Best Day of Week' = ```
+			VAR BestDay = 
+			    TOPN(
+			        1,
+			        VALUES(DimDate[Date]),
+			        [Total Events],
+			        DESC
+			    )
+			VAR BestDayValue = IF(COUNTROWS(BestDay) = 1, MAXX(BestDay, DimDate[Date]), BLANK())
+			RETURN
+			IF(
+			    NOT(ISBLANK(BestDayValue)),
+			    FORMAT(BestDayValue, "dddd"),
+			    "Multiple"
+			)
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights
+		lineageTag: d624cc15-e18d-4f3b-a8d5-4acdbd23f433
+
+	/// Auto-generated insights summary
+	measure 'Quick Insights Text' =
+			VAR TopType = [Top Event Type]
+			VAR BestDay = [Best Day of Week]
+			VAR UniqueViewers = [Unique Viewers]
+			VAR PrevMonthViewers = CALCULATE([Unique Viewers], DATEADD(DimDate[Date], -1, MONTH))
+			VAR MoM = IF(
+			    NOT(ISBLANK(UniqueViewers)),
+			    IF(UniqueViewers > 0,
+			        IF(
+			            NOT(ISBLANK(PrevMonthViewers)),
+			            IF(PrevMonthViewers > 0,
+			                DIVIDE(UniqueViewers - PrevMonthViewers, PrevMonthViewers, 0),
+			                0
+			            ),
+			            0
+			        ),
+			        0
+			    ),
+			    0
+			)
+			VAR MoMText = IF(
+			    MoM > 0,
+			    "📊 Viewership up " & FORMAT(MoM, "0%") & " MoM.",
+			    IF(
+			        MoM < 0,
+			        "📊 Viewership down " & FORMAT(ABS(MoM), "0%") & " MoM.",
+			        "📊 Viewership stable MoM."
+			    )
+			)
+			RETURN
+			"📈 " & IF(ISBLANK(TopType), "Events", TopType) & " events are performing best. " &
+			"📅 " & IF(ISBLANK(BestDay), "N/A", BestDay) & " shows highest engagement. " &
+			MoMText
+		formatString: @
+		displayFolder: 10 - AI Insights
+		lineageTag: ba093008-e622-4754-836c-67a1d06a2db2
+
+	/// Sessions by referral source
+	measure 'Sessions by Source' = CALCULATE(SUM('ga4-traffic-source'[Value]), 'ga4-traffic-source'[Metric] = "Sessions")
+		formatString: #,##0
+		displayFolder: 05 - Traffic Sources
+		lineageTag: da07275b-2f41-492e-a62d-7a3b84ba60b6
+
+	/// Sessions by traffic medium
+	measure 'Sessions by Medium' = CALCULATE(SUM('ga4-traffic-source'[Value]), 'ga4-traffic-source'[Metric] = "Sessions")
+		formatString: #,##0
+		displayFolder: 05 - Traffic Sources
+		lineageTag: 91cdcc86-de4d-4ff4-99c1-a581a95bc33e
+
+	/// Google Search clicks
+	measure 'Search Clicks' = SUM('gsc-chart'[Clicks])
+		formatString: #,##0
+		displayFolder: 06 - Search Console
+		lineageTag: 87f1bef7-1d9f-4441-8cf8-874769239934
+
+	/// Google Search impressions
+	measure 'Search Impressions' = SUM('gsc-chart'[Impressions])
+		formatString: #,##0
+		displayFolder: 06 - Search Console
+		lineageTag: 641ef23e-0209-42e3-9863-9abbeeb70a71
+
+	/// Google Search click-through rate
+	measure 'Search CTR' = DIVIDE(SUM('gsc-chart'[Clicks]), SUM('gsc-chart'[Impressions]), 0)
+		formatString: 0.0%
+		displayFolder: 06 - Search Console
+		lineageTag: 2f49846a-f34c-45ec-9b30-a108ad443d0c
+
+	/// Average Google Search position
+	measure 'Avg Search Position' = AVERAGE('gsc-chart'[Position])
+		formatString: #,##0.0
+		displayFolder: 06 - Search Console
+		lineageTag: d0f20e4a-bd03-4c2d-a95c-81d0f2e3499e
+
+	/// Events month-over-month change
+	measure 'Total Events - MoM' = [Total Events] - CALCULATE([Total Events], DATEADD(DimDate[Date], -1, MONTH))
+		formatString: #,##0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 21ff7ec1-187c-4c2e-aecc-a46b46f8ee99
+
+	/// Events MoM % change
+	measure 'Total Events - MoM %' =
+			DIVIDE(
+			    [Total Events] - CALCULATE([Total Events], DATEADD(DimDate[Date], -1, MONTH)),
+			    CALCULATE([Total Events], DATEADD(DimDate[Date], -1, MONTH)),
+			    0
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: a8ffb3c9-0885-4aea-a3e9-5e78a1128e9d
+
+	/// Events year-over-year change
+	measure 'Total Events - YoY' = [Total Events] - CALCULATE([Total Events], SAMEPERIODLASTYEAR(DimDate[Date]))
+		formatString: #,##0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 7e333a96-4fe6-4a96-975d-036942807439
+
+	/// Events YoY % change
+	measure 'Total Events - YoY %' =
+			DIVIDE(
+			    [Total Events] - CALCULATE([Total Events], SAMEPERIODLASTYEAR(DimDate[Date])),
+			    CALCULATE([Total Events], SAMEPERIODLASTYEAR(DimDate[Date])),
+			    0
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 56b4cacd-4b5c-493b-8024-02952c400fa3
+
+	/// Events year-to-date
+	measure 'Total Events - YTD' = CALCULATE([Total Events], DATESYTD(DimDate[Date]))
+		formatString: #,##0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 1ed12e65-44fb-4053-b9ed-8f09645ad366
+
+	/// Viewers MoM %
+	measure 'Unique Viewers - MoM %' =
+			DIVIDE(
+			    [Unique Viewers] - CALCULATE([Unique Viewers], DATEADD(DimDate[Date], -1, MONTH)),
+			    CALCULATE([Unique Viewers], DATEADD(DimDate[Date], -1, MONTH)),
+			    0
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 1a9616f2-fb37-4448-b339-756e945c74b0
+
+	/// Engagement MoM %
+	measure 'Total Engagement (Hours) - MoM %' =
+			DIVIDE(
+			    [Total Engagement (Hours)] - CALCULATE([Total Engagement (Hours)], DATEADD(DimDate[Date], -1, MONTH)),
+			    CALCULATE([Total Engagement (Hours)], DATEADD(DimDate[Date], -1, MONTH)),
+			    0
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 24f76b6f-ee72-408d-9ea7-7d0e561ebf26
+
+	/// Return rate MoM %
+	measure 'Return Rate - MoM %' =
+			DIVIDE(
+			    [Return Rate] - CALCULATE([Return Rate], DATEADD(DimDate[Date], -1, MONTH)),
+			    CALCULATE([Return Rate], DATEADD(DimDate[Date], -1, MONTH)),
+			    0
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: b5dfb6da-e23f-44fc-a07b-5bc32aef2a2f
+
+	/// Livecast page loads
+	measure 'Live Views' = CALCULATE([Total Events], 'ga4-events'[Event name] = "livecast")
+		formatString: #,##0
+		displayFolder: 02 - Video Performance
+		lineageTag: 1fa62239-8274-4a34-bc4a-6783b4d8b1fa
+
+	/// Replay views (N/A)
+	measure 'Replay Views' = BLANK()
+		formatString: #,##0
+		isHidden
+		displayFolder: 02 - Video Performance
+		lineageTag: 14fb7cfe-b78d-4de5-9276-f6c7194d1eca
+
+	/// Event rank by count
+	measure 'Event Rank' =
+			IF(
+			    HASONEVALUE(DimLivecast[livecast_title]),
+			    RANKX(
+			        ALL(DimLivecast[livecast_title]),
+			        [Total Events],
+			        ,
+			        DESC,
+			        DENSE
+			    ),
+			    BLANK()
+			)
+		formatString: #,##0
+		displayFolder: 02 - Video Performance
+		lineageTag: 0824f87d-4fad-4822-865c-dca8025a15c0
+
+	/// Event rank by viewers
+	measure 'Event Rank by Viewers' =
+			IF(
+			    HASONEVALUE(DimLivecast[livecast_title]),
+			    RANKX(
+			        ALL(DimLivecast[livecast_title]),
+			        [Unique Viewers],
+			        ,
+			        DESC,
+			        DENSE
+			    ),
+			    BLANK()
+			)
+		formatString: #,##0
+		displayFolder: 02 - Video Performance
+		lineageTag: f61c7ed8-e827-4517-8b75-522c55cbf388
+
+	/// Avg event duration
+	measure 'Avg Event Duration (Minutes)' =
+			DIVIDE(
+			    [Total Engagement (Minutes)],
+			    [Active Livecasts],
+			    0
+			)
+		formatString: #,##0.0
+		displayFolder: 02 - Video Performance
+		lineageTag: 33743a60-da2d-4ec1-bd7a-7182e63db473
+
+	/// Peak concurrent viewers
+	measure 'Peak Concurrent Viewers' = MAX('ga4-daily'[Total users])
+		formatString: #,##0
+		displayFolder: 02 - Video Performance
+		lineageTag: e9c8b039-d7b5-490f-900a-416fa649f4d4
+
+	/// Trend arrow symbol
+	measure 'Trend Indicator' =
+			VAR MoM = [Total Events - MoM %]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    MoM > 0.05, "▲",
+			    MoM < -0.05, "▼",
+			    "►"
+			)
+		formatString: @
+		displayFolder: 99 - Utility
+		lineageTag: 6a21e81a-e221-4238-b97d-1f7798171394
+
+	/// Trend color code
+	measure 'Trend Color' =
+			VAR MoM = [Total Events - MoM %]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    MoM > 0.05, "#00A878",
+			    MoM < -0.05, "#E63946",
+			    "#F4A261"
+			)
+		formatString: @
+		displayFolder: 99 - Utility
+		lineageTag: 52b2ec1f-6b88-453e-8b06-6dd9fedff334
+
+	/// Formatted date range
+	measure 'Date Range Text' =
+			VAR MinDate = MIN(DimDate[Date])
+			VAR MaxDate = MAX(DimDate[Date])
+			RETURN
+			FORMAT(MinDate, "MMM d") & " - " & FORMAT(MaxDate, "MMM d, yyyy")
+		formatString: @
+		displayFolder: 99 - Utility
+		lineageTag: 2a22b5bc-5841-4920-bd6d-86ec3339a733
+
+	/// Selected event label
+	measure 'Selected Event Title' =
+			IF(
+			    HASONEVALUE(DimLivecast[livecast_title]),
+			    SELECTEDVALUE(DimLivecast[livecast_title]),
+			    "All Events"
+			)
+		formatString: @
+		displayFolder: 99 - Utility
+		lineageTag: 1cb9ac88-1d82-4bbf-9fb0-16be21eec4b1
+
+	/// Date range short format
+	measure 'Selected Date Range' =
+			VAR MinDate = MIN(DimDate[Date])
+			VAR MaxDate = MAX(DimDate[Date])
+			RETURN
+			FORMAT(MinDate, "Short Date") & " to " & FORMAT(MaxDate, "Short Date")
+		formatString: @
+		displayFolder: 99 - Utility
+		lineageTag: 933668b5-7759-4373-b0a7-2fdbf9d14346
+
+	/// Previous month events
+	measure 'Total Events - Previous Month' = CALCULATE([Total Events], DATEADD(DimDate[Date], -1, MONTH))
+		formatString: #,##0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: ec285111-06ef-4c52-be92-365825495107
+
+	/// Previous year events
+	measure 'Total Events - Previous Year' = CALCULATE([Total Events], SAMEPERIODLASTYEAR(DimDate[Date]))
+		formatString: #,##0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: f1cd0e4e-e78e-46b8-a571-7cee8568dd78
+
+	/// Viewers year-to-date
+	measure 'Unique Viewers - YTD' = CALCULATE([Unique Viewers], DATESYTD(DimDate[Date]))
+		formatString: #,##0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 1f800460-9cb7-4e04-8a1d-f606c25c4b68
+
+	/// Engagement YTD (hours)
+	measure 'Total Engagement (Hours) - YTD' = CALCULATE([Total Engagement (Hours)], DATESYTD(DimDate[Date]))
+		formatString: #,##0.0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: f3d387a2-b4af-4ec2-b746-8c7f1ba9f83a
+
+	/// % of page visitors who clicked play
+	measure 'Play Conversion Rate' = DIVIDE([Video Plays], [Total Events], 0)
+		formatString: 0.0%
+		displayFolder: 02 - Video Performance
+		lineageTag: 69ecece7-80ce-454b-88f6-b06897c87a47
+
+	/// Live/replay ratio (N/A)
+	measure 'Live vs Replay Ratio' = DIVIDE([Live Views], [Replay Views], 0)
+		formatString: #,##0.0
+		isHidden
+		displayFolder: 02 - Video Performance
+		lineageTag: eca35e88-3b40-47a8-9dbf-14d021b2a78d
+
+	/// Average pages viewed per session
+	measure 'Avg Pages per Session' = DIVIDE([Page Views], [Sessions], 0)
+		formatString: #,##0.00
+		displayFolder: 01 - KPI Cards
+		lineageTag: 24f1b5f7-3745-4207-8a76-f62f8be4f22c
+
+	/// Sessions month-over-month % change
+	measure 'Sessions - MoM %' =
+			VAR CurrentValue = [Sessions]
+			VAR PriorMonthValue = CALCULATE([Sessions], DATEADD(DimDate[Date], -1, MONTH))
+			RETURN
+			IF(
+			    NOT ISBLANK(PriorMonthValue) && PriorMonthValue <> 0,
+			    DIVIDE(CurrentValue - PriorMonthValue, PriorMonthValue),
+			    BLANK()
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 60449241-c4c6-4cb0-9d1c-64f78c669e46
+
+	/// Sessions MoM trend label
+	measure 'Sessions - MoM Label' = ```
+			VAR Delta = [Sessions - MoM %]
+			VAR Arrow = 
+			    SWITCH(
+			        TRUE(),
+			        Delta > 0, "▲",
+			        Delta < 0, "▼",
+			        BLANK()
+			    )
+			RETURN
+			IF(
+			    ISBLANK(Delta),
+			    BLANK(),
+			    Arrow & " " & FORMAT(ABS(Delta), "0%") & " MoM"
+			)
+			```
+		formatString: @
+		displayFolder: 99 - Utility\KPI Labels
+		lineageTag: b0a7c6a8-4e1e-43ab-ad4f-2f76c5aa5c3f
+
+	/// Sessions MoM color
+	measure 'Sessions - MoM Color' =
+			VAR Delta = [Sessions - MoM %]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    Delta > 0, "#2E7D32",
+			    Delta < 0, "#C62828",
+			    "#9E9E9E"
+			)
+		formatString: @
+		displayFolder: 99 - Utility\KPI Colors
+		lineageTag: 818edd27-5f13-4209-b1a3-4dcd2e28f714
+
+	/// Page Views month-over-month % change
+	measure 'Page Views - MoM %' =
+			VAR CurrentValue = [Page Views]
+			VAR PriorMonthValue = CALCULATE([Page Views], DATEADD(DimDate[Date], -1, MONTH))
+			RETURN
+			IF(
+			    NOT ISBLANK(PriorMonthValue) && PriorMonthValue <> 0,
+			    DIVIDE(CurrentValue - PriorMonthValue, PriorMonthValue),
+			    BLANK()
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 3414e565-0350-40a0-ad1e-d00624aeb1a4
+
+	/// Page Views MoM label
+	measure 'Page Views - MoM Label' = ```
+			VAR Delta = [Page Views - MoM %]
+			VAR Arrow = 
+			    SWITCH(
+			        TRUE(),
+			        Delta > 0, "▲",
+			        Delta < 0, "▼",
+			        BLANK()
+			    )
+			RETURN
+			IF(
+			    ISBLANK(Delta),
+			    BLANK(),
+			    Arrow & " " & FORMAT(ABS(Delta), "0%") & " MoM"
+			)
+			```
+		formatString: @
+		displayFolder: 99 - Utility\KPI Labels
+		lineageTag: 1709c3c1-56f1-47d2-ad11-571209d845a2
+
+	/// Page Views MoM color
+	measure 'Page Views - MoM Color' =
+			VAR Delta = [Page Views - MoM %]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    Delta > 0, "#2E7D32",
+			    Delta < 0, "#C62828",
+			    "#9E9E9E"
+			)
+		formatString: @
+		displayFolder: 99 - Utility\KPI Colors
+		lineageTag: fa1c538b-dd99-4f22-a3a9-e5eeb996597d
+
+	/// Avg Pages/Session MoM % change
+	measure 'Avg Pages per Session - MoM %' =
+			VAR CurrentValue = [Avg Pages per Session]
+			VAR PriorMonthValue = CALCULATE([Avg Pages per Session], DATEADD(DimDate[Date], -1, MONTH))
+			RETURN
+			IF(
+			    NOT ISBLANK(PriorMonthValue) && PriorMonthValue <> 0,
+			    DIVIDE(CurrentValue - PriorMonthValue, PriorMonthValue),
+			    BLANK()
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 9df37916-42cd-4350-935c-4cb0746b3dd6
+
+	/// Avg Pages MoM label
+	measure 'Avg Pages per Session - MoM Label' = ```
+			VAR Delta = [Avg Pages per Session - MoM %]
+			VAR Arrow = 
+			    SWITCH(
+			        TRUE(),
+			        Delta > 0, "▲",
+			        Delta < 0, "▼",
+			        BLANK()
+			    )
+			RETURN
+			IF(
+			    ISBLANK(Delta),
+			    BLANK(),
+			    Arrow & " " & FORMAT(ABS(Delta), "0%") & " MoM"
+			)
+			```
+		formatString: @
+		displayFolder: 99 - Utility\KPI Labels
+		lineageTag: c938d77b-c594-4516-94ab-2aaa7d2a5dab
+
+	/// Avg Pages MoM color
+	measure 'Avg Pages per Session - MoM Color' =
+			VAR Delta = [Avg Pages per Session - MoM %]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    Delta > 0, "#2E7D32",
+			    Delta < 0, "#C62828",
+			    "#9E9E9E"
+			)
+		formatString: @
+		displayFolder: 99 - Utility\KPI Colors
+		lineageTag: f7e6b1a2-e796-4b0e-88f5-f0fab4a4632d
+
+	/// Sessions screen reader text
+	measure 'Sessions Alt Text' = ```
+			"KPI card showing total sessions count: " & 
+			FORMAT([Sessions], "#,##0") & 
+			" sessions" & 
+			IF(
+			    NOT ISBLANK([Sessions - MoM %]),
+			    ". Month-over-month change: " & FORMAT([Sessions - MoM %], "0%"),
+			    ""
+			)
+			```
+		formatString: @
+		displayFolder: 99 - Utility\Accessibility
+		lineageTag: 46a10cd0-d351-4cd0-b5b1-8d12f49b82f8
+
+	/// Page views screen reader text
+	measure 'Page Views Alt Text' = ```
+			"KPI card showing total page views count: " & 
+			FORMAT([Page Views], "#,##0") & 
+			" page views" & 
+			IF(
+			    NOT ISBLANK([Page Views - MoM %]),
+			    ". Month-over-month change: " & FORMAT([Page Views - MoM %], "0%"),
+			    ""
+			)
+			```
+		formatString: @
+		displayFolder: 99 - Utility\Accessibility
+		lineageTag: d3b7179c-8e54-40f7-9fd3-3ddc948faa05
+
+	/// Avg pages screen reader text
+	measure 'Avg Pages Alt Text' = ```
+			"KPI card showing average pages per session: " & 
+			FORMAT([Avg Pages per Session], "#,##0.00") & 
+			" pages per session" & 
+			IF(
+			    NOT ISBLANK([Avg Pages per Session - MoM %]),
+			    ". Month-over-month change: " & FORMAT([Avg Pages per Session - MoM %], "0%"),
+			    ""
+			)
+			```
+		formatString: @
+		displayFolder: 99 - Utility\Accessibility
+		lineageTag: cbfdf4b8-373e-4836-9127-4448c67b1673
+
+	/// Top device screen reader text
+	measure 'Top Device Alt Text' = ```
+			"KPI card showing top device category: " & 
+			[Top Device Category] & 
+			". This is the device type with the highest session count."
+			```
+		formatString: @
+		displayFolder: 99 - Utility\Accessibility
+		lineageTag: d72710d8-0f26-4e6f-a42f-09006dbe361a
+
+	/// Top device by sessions for live events
+	measure 'Top Device Category' = ```
+			// Uses livecast-specific device data
+			VAR NonBlankDevices = 
+			    FILTER(
+			        VALUES('ga4-devices'[Device category]), 
+			        NOT(ISBLANK('ga4-devices'[Device category])) && 'ga4-devices'[Device category] <> ""
+			    )
+			VAR TopSessionCount =
+			    MAXX(
+			        NonBlankDevices,
+			        CALCULATE(SUM('ga4-devices'[Sessions]))
+			    )
+			VAR TiedDevices =
+			    FILTER(
+			        NonBlankDevices,
+			        CALCULATE(SUM('ga4-devices'[Sessions])) = TopSessionCount
+			    )
+			VAR TopCategory = 
+			    IF(
+			        ISBLANK(TopSessionCount),
+			        BLANK(),
+			        MINX(TiedDevices, 'ga4-devices'[Device category])
+			    )
+			RETURN
+			IF(
+			    ISBLANK(TopCategory),
+			    BLANK(),
+			    UPPER(LEFT(TopCategory, 1)) & LOWER(MID(TopCategory, 2, LEN(TopCategory)))
+			)
+			```
+		formatString: @
+		displayFolder: 01 - KPI Cards
+		lineageTag: 58819cc3-7080-457c-86ed-25a6ccc82926
+
+	/// Sessions by device for live events
+	measure 'Device Sessions' =
+			// Uses livecast-specific device data
+			SUM('ga4-devices'[Sessions])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: e8630c04-9104-49ed-83a3-e63a1711dd79
+
+	/// Page loads by URL
+	measure 'Page Traffic' = SUM('ga4-pages'[Views])
+		formatString: #,##0
+		displayFolder: 03 - Page Traffic
+		lineageTag: 71b4c642-10a1-46b8-ac6e-dfb5f452c7c6
+
+	/// Engagement rate by page
+	measure 'Page Engagement' = AVERAGE('ga4-pages'[Engagement rate])
+		formatString: 0.00%
+		displayFolder: 03 - Page Traffic
+		lineageTag: aa9ad4b1-36f4-4924-879a-9c4e81913a2c
+
+	/// Video page loads (user visited video page)
+	measure 'Video Page Loads' = CALCULATE(SUM('ga4-pages'[Views]))
+		formatString: #,##0
+		displayFolder: 02 - Video Performance
+		lineageTag: 5fd3372e-3915-421e-b408-5311c34a4663
+
+	/// Average watch time
+	measure 'Livecast Avg Time' = CALCULATE(AVERAGE('ga4-pages'[Average engagement time per session]))
+		formatString: #,##0.00
+		displayFolder: 02 - Video Performance
+		lineageTag: 2d0e3147-cb54-4795-8fa1-d5c34210fd80
+
+	/// Sessions dropped >10%
+	measure 'Signal - Sessions MoM Drop?' =
+			VAR MoMPct = [Sessions - MoM %]
+			RETURN
+			IF(
+			    NOT(ISBLANK(MoMPct)) && MoMPct < -0.10,
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 5c7e85e5-0e23-4d19-9e84-7b5c3a2e5d0a
+
+	/// Mobile >60% - uses livecast-specific device data
+	measure 'Signal - Mobile Share Elevated?' =
+			// Uses livecast-specific device data
+			VAR MobileShare = [Mobile Share %]
+			RETURN
+			IF(
+			    NOT(ISBLANK(MobileShare)) && MobileShare > 0.60,
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 2b4c6e7f-8d34-4e1a-8a75-9c3f5e6a7b8c
+
+	/// Top city >40% - uses livecast-specific geography data
+	measure 'Signal - Geo Concentrated?' =
+			// Uses livecast-specific geography data
+			VAR TopCityShare = [Top City Share %]
+			RETURN
+			IF(
+			    NOT(ISBLANK(TopCityShare)) && TopCityShare > 0.40,
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b
+
+	/// Play rate <30%
+	measure 'Signal - Play Rate Opportunity?' =
+			VAR PlayRate = DIVIDE([Video Plays], [Sessions], 0)
+			RETURN
+			IF(
+			    NOT(ISBLANK(PlayRate)) && PlayRate < 0.30,
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c
+
+	/// Mobile traffic share for live events (uses livecast-specific device data)
+	measure 'Mobile Share %' = ```
+			// Uses livecast-specific device data from ga4-devices table
+			VAR MobileSessions = CALCULATE(
+			    SUM('ga4-devices'[Sessions]), 
+			    'ga4-devices'[Device category] = "mobile"
+			)
+			VAR TotalDeviceSessions = CALCULATE(
+			    SUM('ga4-devices'[Sessions]), 
+			    'ga4-devices'[Device category] <> BLANK()
+			)
+			RETURN
+			DIVIDE(MobileSessions, TotalDeviceSessions, 0)
+			```
+		formatString: 0.0%
+		displayFolder: 10 - AI Insights\Calculated
+		lineageTag: a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d
+
+	/// Top city concentration for live events
+	measure 'Top City Share %' =
+			// Uses livecast-specific geography data
+			MAXX(
+			    VALUES('ga4-geography-livecast-play'[City]),
+			    DIVIDE(
+			        CALCULATE([Sessions by City]),
+			        CALCULATE([Sessions by City], ALL('ga4-geography-livecast-play'[City])),
+			        0
+			    )
+			)
+		formatString: 0.0%
+		displayFolder: 10 - AI Insights\Calculated
+		lineageTag: b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e
+
+	/// Video play rate
+	measure 'Play Rate %' = DIVIDE([Video Plays], [Live Views], 0)
+		formatString: 0.0%
+		displayFolder: 10 - AI Insights\Calculated
+		lineageTag: c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f
+
+	/// Dynamic action recommendations
+	measure 'Recommended Actions HTML (Dynamic)' =
+			VAR ActiveTable =
+			    FILTER(
+			        ADDCOLUMNS(
+			            'Action Catalog',
+			            "IsActive",
+			                SWITCH(
+			                    'Action Catalog'[ActionKey],
+			                    "MOM_DROP",  [Signal - Sessions MoM Drop?],
+			                    "MOBILE",    [Signal - Mobile Share Elevated?],
+			                    "GEO",       [Signal - Geo Concentrated?],
+			                    "PLAYRATE",  [Signal - Play Rate Opportunity?],
+			                    0
+			                ),
+			            "Priority",
+			                SWITCH(
+			                    'Action Catalog'[ActionKey],
+			                    "PLAYRATE", IF([Signal - Play Rate Opportunity?]=1,"HIGH",'Action Catalog'[DefaultPriority]),
+			                    'Action Catalog'[DefaultPriority]
+			                ),
+			            "SignalText",
+			                SWITCH(
+			                    'Action Catalog'[ActionKey],
+			                    "MOM_DROP", "Signal observed: Sessions down " & FORMAT(ABS([Sessions - MoM %]), "0%") & " vs prior month.",
+			                    "MOBILE",   "Signal observed: Mobile share at " & FORMAT([Mobile Share %], "0%") & ".",
+			                    "GEO",      "Signal observed: Top city share at " & FORMAT([Top City Share %], "0%") & ".",
+			                    "PLAYRATE", "Signal observed: Play rate at " & FORMAT([Play Rate %], "0%") & ".",
+			                    BLANK()
+			                ),
+			            "IconX", 'Action Catalog'[Icon],
+			            "TitleX", 'Action Catalog'[Title],
+			            "PromptX", 'Action Catalog'[Prompt],
+			            "SortX", 'Action Catalog'[Sort]
+			        ),
+			        [IsActive] = 1
+			    )
+			
+			VAR HasAny = COUNTROWS(ActiveTable) > 0
+			
+			VAR Header =
+			"<div style='font-family:Segoe UI;'>
+			  <div style='font-size:14px; font-weight:600; color:#1B1B1B; margin-bottom:10px;'>
+			    Areas to Review
+			  </div>"
+			
+			VAR EmptyState =
+			"<div style='background:#F8F9FA; border:1px solid #DFE1E2; padding:12px; border-radius:6px;'>
+			   <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>No review flags for the selected period</div>
+			   <div style='font-size:11px; color:#565C65; line-height:1.25;'>Adjust date range or filters to explore patterns.</div>
+			 </div>"
+			
+			VAR Cards =
+			CONCATENATEX(
+			    ActiveTable,
+			    VAR p = [Priority]
+			    VAR icon = [IconX]
+			    VAR title = [TitleX]
+			    VAR signal = [SignalText]
+			    VAR prompt = [PromptX]
+			
+			    VAR Border =
+			        SWITCH(p, "HIGH", "#D83933", "MEDIUM", "#FFBE2E", "INFO", "#005EA2", "#71767A")
+			    VAR Bg =
+			        SWITCH(p, "HIGH", "#FFF1F0", "MEDIUM", "#FFF8E6", "INFO", "#E7F2E8", "#F0F0F0")
+			
+			    RETURN
+			    "<div style='background:" & Bg & "; " &
+			                "border-left:4px solid " & Border & "; " &
+			                "padding:12px; margin-bottom:8px; border-radius:6px;'> " &
+			        "<div style='font-size:11px; font-weight:700; color:" & Border & "; margin-bottom:6px; letter-spacing:0.3px;'> " &
+			            icon & " REVIEW " &
+			        "</div> " &
+			        "<div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'> " &
+			            title & " " &
+			        "</div> " &
+			        "<div style='font-size:11px; color:#565C65; margin-bottom:6px; line-height:1.25;'> " &
+			            signal & " " &
+			        "</div> " &
+			        "<div style='font-size:11px; color:#565C65; line-height:1.25;'> " &
+			            "<span style='font-weight:600; color:#3D4551;'>Suggested check:</span> " & prompt & " " &
+			        "</div> " &
+			    "</div>",
+			    UNICHAR(10),
+			    [SortX],
+			    ASC
+			)
+			
+			RETURN
+			Header & IF(HasAny, Cards, EmptyState) & "</div>"
+		formatString: @
+		displayFolder: 10 - AI Insights
+		lineageTag: d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f4a
+
+	/// Users by page
+	measure 'Total Users (by Page)' = ```
+			SUM('ga4-pages'[Total users])
+			
+			```
+		formatString: #,##0
+		displayFolder: 03 - Page Traffic
+		lineageTag: 7a8264d8-c625-4752-b88d-0a8276f7560a
+
+	/// Users for flow visualization
+	measure 'Users (Flow)' = CALCULATE(SUM('ga4-traffic-source'[Value]), 'ga4-traffic-source'[Metric] = "Total users")
+		formatString: #,##0
+		displayFolder: 05 - Traffic Sources
+		lineageTag: 5543c721-8208-4158-b391-456093159936
+
+	/// Min CTR check
+	measure 'QA - CTR Min' = MIN('gsc-chart'[CTR])
+		formatString: 0.00%
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+
+	/// Max CTR check
+	measure 'QA - CTR Max' = MAX('gsc-chart'[CTR])
+		formatString: 0.00%
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+
+	/// Date filter test
+	measure 'QA - Date Filters Sessions' =
+			VAR AllSessions = CALCULATE([Sessions], ALL(DimDate))
+			VAR FilteredSessions = [Sessions]
+			RETURN
+			IF(
+			    AllSessions = FilteredSessions,
+			    "⚠️ Date slicer not impacting Sessions",
+			    "✅ Date slicer impacting Sessions"
+			)
+		formatString: @
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+
+	/// Engagement time check
+	measure 'QA - Engagement Time Check' =
+			VAR AvgEngagement = DIVIDE([Total Engagement (Minutes)], [Sessions], 0)
+			RETURN
+			IF(
+			    AvgEngagement < 1 || AvgEngagement > 60,
+			    "⚠️ Avg engagement " & FORMAT(AvgEngagement, "#,##0.0") & " min seems unusual",
+			    "✅ Avg engagement " & FORMAT(AvgEngagement, "#,##0.0") & " min looks reasonable"
+			)
+		formatString: @
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+
+	/// Data type check
+	measure 'QA - ga4-titles Type Check' =
+			VAR TestSum = IFERROR(CALCULATE(SUM('ga4-titles'[Event count])), -999)
+			RETURN
+			IF(
+			    TestSum = -999,
+			    "⚠️ ga4-titles[Event count] is TEXT",
+			    "✅ ga4-titles[Event count] is numeric"
+			)
+		formatString: @
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+
+	/// Relationship check
+	measure 'QA - DimDate Relationship' =
+			VAR DatesInDim = COUNTROWS(DimDate)
+			VAR DatesInFact = CALCULATE(COUNTROWS(DimDate), ALL(DimDate))
+			RETURN
+			IF(
+			    DatesInDim = DatesInFact,
+			    "⚠️ Date filter not working - check DimDate relationship",
+			    "✅ Date relationship working"
+			)
+		formatString: @
+		isHidden
+		displayFolder: QA - Validation
+		lineageTag: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+
+	/// Users by referral source
+	measure 'Users by Source' = CALCULATE(SUM('ga4-traffic-source'[Value]), 'ga4-traffic-source'[Metric] = "Total users")
+		formatString: #,##0
+		displayFolder: 05 - Traffic Sources
+		lineageTag: a5bc08db-a5a0-44ef-a07b-9ef8077fbb0b
+
+	/// Engagement by source
+	measure 'Engagement Rate by Source' = CALCULATE(AVERAGE('ga4-traffic-source'[Value]), 'ga4-traffic-source'[Metric] = "Engagement rate")
+		formatString: 0.0%
+		displayFolder: 05 - Traffic Sources
+		lineageTag: 84f72f47-e4bc-4202-af75-33b5b50b98b4
+
+	/// Bounce rate (single page sessions)
+	measure 'Bounce Rate' =
+			VAR EngagedSessions = SUM('ga4-daily'[Engaged sessions])
+			VAR TotalSessions = SUM('ga4-daily'[Sessions])
+			RETURN
+			IF(
+			    TotalSessions = 0,
+			    BLANK(),
+			    DIVIDE(TotalSessions - EngagedSessions, TotalSessions, 0)
+			)
+		formatString: 0.0%
+		displayFolder: 07 - Engagement
+		lineageTag: c7890a69-ded3-4c8d-bdb6-6f15b3bd7e86
+
+	/// Percentage of single-page sessions
+	measure 'Single Page Sessions %' =
+			VAR TotalSessions = [Sessions]
+			VAR TotalViews = [Page Views]
+			VAR AvgPagesPerSession = DIVIDE(TotalViews, TotalSessions, 1)
+			RETURN
+			IF(
+			    AvgPagesPerSession <= 1.1,
+			    1,
+			    DIVIDE(1, AvgPagesPerSession, 0)
+			)
+		formatString: 0.0%
+		displayFolder: 07 - Engagement
+		lineageTag: 8b37406c-f9ef-4707-973a-619a59244dcf
+
+	/// Average session length in minutes
+	measure 'Avg Session Duration (Minutes)' =
+			VAR EngagementRate = AVERAGE('ga4-daily'[Engagement rate])
+			RETURN
+			IF(
+			    ISBLANK(EngagementRate),
+			    BLANK(),
+			    EngagementRate * 5
+			)
+		formatString: 0.0
+		displayFolder: 07 - Engagement
+		lineageTag: a57a7098-0cb2-48f1-9fdc-e95310175f85
+
+	/// Impressions by search query
+	measure 'Impressions by Query' = SUM('gsc-queries'[Impressions])
+		formatString: #,##0
+		displayFolder: 06 - Search Console
+		lineageTag: a0620611-4c6d-408b-a962-f1da9edbf344
+
+	/// Clicks by search query
+	measure 'Clicks by Query' = SUM('gsc-queries'[Clicks])
+		formatString: #,##0
+		displayFolder: 06 - Search Console
+		lineageTag: d9f13619-4dec-4bda-aa99-aa48a5ba082a
+
+	/// CTR by search query
+	measure 'CTR by Query' =
+			VAR TotalClicks = SUM('gsc-queries'[Clicks])
+			VAR TotalImpressions = SUM('gsc-queries'[Impressions])
+			RETURN
+			DIVIDE(TotalClicks, TotalImpressions, 0)
+		formatString: 0.00%
+		displayFolder: 06 - Search Console
+		lineageTag: 0f20de5c-069b-432c-8a2c-9d39543bda7d
+
+	/// Position by search query
+	measure 'Position by Query' = AVERAGE('gsc-queries'[Position])
+		formatString: 0.0
+		displayFolder: 06 - Search Console
+		lineageTag: 6af4266c-90f0-44ee-a053-d3811b02e9b3
+
+	/// Average engagement per page
+	measure 'Avg Engagement by Page (Minutes)' = AVERAGE('ga4-pages'[Average engagement time per session]) / 60
+		formatString: 0.0
+		displayFolder: 07 - Engagement
+		lineageTag: 7492bddb-b752-4784-a20c-d31650076a2d
+
+	/// Bounce rate >50%
+	measure 'Signal - Bounce Rate Elevated?' = IF([Bounce Rate] > 0.50, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: d4c04b28-267c-4fe0-9c4c-37764f288d2b
+
+	/// Avg session <2 min
+	measure 'Signal - Engagement Below Average?' = IF([Avg Session Duration (Minutes)] < 2, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: ee40a3d0-db9f-4c4d-bc8a-997fc612d763
+
+	/// Single page >40%
+	measure 'Signal - Single Page Sessions High?' = IF([Single Page Sessions %] > 0.40, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: d8a4b745-3125-4220-a4b8-f9bc59436a18
+
+	/// Drop-off >30%
+	measure 'Signal - Video Drop-off Spike?' =
+			VAR PlayEvents = [Video Plays]
+			VAR TotalViews = [Page Views]
+			VAR DropOffRate = DIVIDE(TotalViews - PlayEvents, TotalViews, 0)
+			RETURN IF(DropOffRate > 0.30, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 01892e48-9045-4168-87da-c9cff96fbdb7
+
+	/// Completion <45%
+	measure 'Signal - Completion Rate Below Industry?' =
+			VAR CompletionRate = [Play Conversion Rate]
+			RETURN IF(CompletionRate < 0.45, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: b9532863-8cda-4053-bcee-7fb61bceffa3
+
+	/// Watch time down
+	measure 'Signal - Watch Time Declining?' = IF([Total Engagement (Hours) - MoM %] < -0.10, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 0e9cb9dd-33d6-4af0-ba06-942b269bf87b
+
+	/// CTR opportunity
+	measure 'Signal - CTR Below Potential?' =
+			VAR AvgPosition = [Avg Search Position]
+			VAR AvgCTR = [Search CTR]
+			RETURN IF(AvgPosition < 10 && AvgCTR < 0.05, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 2e49abd5-c96f-4125-9b3b-1a8565a84c71
+
+	/// Position >10
+	measure 'Signal - Position Drop?' =
+			VAR CurrentPosition = [Avg Search Position]
+			RETURN IF(CurrentPosition > 10, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: d77887ed-317c-4e66-a160-1abf79d3816e
+
+	/// Impressions high, CTR low
+	measure 'Signal - Impression Spike No Clicks?' =
+			VAR Impressions = [Search Impressions]
+			VAR Clicks = [Search Clicks]
+			VAR CTR = DIVIDE(Clicks, Impressions, 0)
+			RETURN IF(Impressions > 1000 && CTR < 0.02, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: e4a23ed0-4aad-4007-ba9f-320ce78cc0ef
+
+	/// Sessions outlier
+	measure 'Signal - Anomaly Detected?' =
+			VAR CurrentSessions = [Sessions]
+			VAR AvgSessions = AVERAGEX(ALL(DimDate), [Sessions])
+			VAR SessionStdDev = STDEVX.P(ALL(DimDate), [Sessions])
+			VAR ZScore = DIVIDE(CurrentSessions - AvgSessions, SessionStdDev, 0)
+			RETURN IF(ABS(ZScore) > 3, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 5ba62dd4-2890-4d4e-88c4-503fb2aaa5a4
+
+	/// <60 days data
+	measure 'Signal - Forecast Confidence Low?' =
+			VAR DataPoints = COUNTROWS(DimDate)
+			RETURN IF(DataPoints < 60, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 9d3cfb38-8991-469f-a30e-a84564da4892
+
+	/// <30 days data
+	measure 'Signal - Insufficient Data?' =
+			VAR DataPoints = COUNTROWS(DimDate)
+			RETURN IF(DataPoints < 30, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 64955a74-97c9-4a4d-a69f-3578c014c982
+
+	/// Segment >30% above avg
+	measure 'Signal - Segment Outperformance?' =
+			VAR CurrentEngagement = [Engagement Rate]
+			VAR OverallEngagement = CALCULATE([Engagement Rate], ALL())
+			VAR Outperformance = DIVIDE(CurrentEngagement - OverallEngagement, OverallEngagement, 0)
+			RETURN IF(Outperformance > 0.30, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 40290c1b-cfc2-4b94-ba60-baa41d384125
+
+	/// Correlation detection
+	measure 'Signal - Correlation Strength?' = 0
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: 0ed1adf2-a07e-4044-a20f-ad80530cd0f9
+
+	/// Retention dropped >20%
+	measure 'Signal - Cohort Retention Drop?' = IF([Return Rate - MoM %] < -0.20, 1, 0)
+		formatString: 0
+		displayFolder: 10 - AI Insights\Signals
+		lineageTag: f3bb3c9e-3902-44eb-940e-dd80fc4e7c1a
+
+	/// Data confidence (0-100)
+	measure 'Model Confidence Score' =
+			VAR DataPoints = COUNTROWS(DimDate)
+			VAR MaxConfidence = 100
+			VAR MinDaysForFullConfidence = 90
+			RETURN
+			MIN(DIVIDE(DataPoints, MinDaysForFullConfidence, 0) * MaxConfidence, MaxConfidence)
+		formatString: 0
+		displayFolder: 10 - AI Insights
+		lineageTag: 6d621912-c939-4104-a4c1-2deb96746a95
+
+	/// Sessions for decomposition tree
+	measure 'Sessions (Decomposition)' = [Sessions]
+		formatString: #,##0
+		displayFolder: 99 - Utility
+		lineageTag: 97802257-d5ab-4f80-a214-7030491dc8d8
+
+	/// Users by event type
+	measure 'Users by Event' = SUM('ga4-titles'[Total users])
+		formatString: #,##0
+		displayFolder: 02 - Video Performance
+		lineageTag: a4b9cbe7-7a77-4ffa-8536-72a625b1d1bc
+
+	/// Sessions for trend charts
+	measure 'Sessions by Date' = SUM('ga4-daily'[Sessions])
+		formatString: #,##0
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 2101747c-a59b-488d-89b3-4cdd097f91b3
+
+	/// Sessions by device category for live events
+	measure 'Sessions by Device' =
+			// Uses livecast-specific device data
+			SUM('ga4-devices'[Sessions])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: 9f4145f1-c36a-41c0-91c1-0347252aa5d3
+
+	/// Users by device category for live events
+	measure 'Users by Device' =
+			// Uses livecast-specific device data
+			SUM('ga4-devices'[Total users])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: f0c1b4a1-cc69-445f-9116-c7fa6b27aef9
+
+	/// Views by device category
+	measure 'Views by Device' = SUM('ga4-devices'[Views])
+		formatString: #,##0
+		isHidden
+		displayFolder: 01 - KPI Cards
+		lineageTag: 2f3a8d11-b781-4add-88c1-9c32bac48489
+
+	/// Engagement rate by device
+	measure 'Engagement Rate by Device' = AVERAGE('ga4-devices'[Engagement rate])
+		formatString: 0.0%
+		isHidden
+		displayFolder: 07 - Engagement
+		lineageTag: 87d46c6b-9dbd-44b7-877a-90f0cd959852
+
+	/// Sessions by location
+	measure 'Sessions by Geography' = SUM('ga4-geography'[Sessions])
+		formatString: #,##0
+		displayFolder: 04 - Geography
+		lineageTag: e7566ac4-28e8-4474-9784-6f9878a534db
+
+	/// Users by location
+	measure 'Users by Geography' = SUM('ga4-geography'[Total users])
+		formatString: #,##0
+		displayFolder: 04 - Geography
+		lineageTag: 4a4a65ed-94f4-42a1-814b-dc8156221e02
+
+	/// Actions for Explorer
+	measure 'Actions - Explorer Page' = ```
+			VAR BounceHigh = [Signal - Bounce Rate Elevated?]
+			VAR EngagementLow = [Signal - Engagement Below Average?]
+			VAR SinglePageHigh = [Signal - Single Page Sessions High?]
+			
+			VAR Header = 
+			"<div style='font-family:Segoe UI;'>
+			  <div style='font-size:14px; font-weight:600; color:#1B1B1B; margin-bottom:10px;'>
+			    Areas to Review
+			  </div>"
+			
+			VAR Card1 = 
+			IF(BounceHigh = 1,
+			"<div style='background:#FFF1F0; border-left:4px solid #D83933; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#D83933; margin-bottom:6px;'>⚠️ REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>High Bounce Rate Detected</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Bounce rate exceeds 50% threshold.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Review landing page content and load times.</div>
+			</div>",
+			"")
+			
+			VAR Card2 = 
+			IF(EngagementLow = 1,
+			"<div style='background:#FFF8E6; border-left:4px solid #FFBE2E; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#FFBE2E; margin-bottom:6px;'>📊 REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Engagement Below Average</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Average session duration under 2 minutes.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Analyze content relevance and page depth.</div>
+			</div>",
+			"")
+			
+			VAR Card3 = 
+			IF(SinglePageHigh = 1,
+			"<div style='background:#E7F2E8; border-left:4px solid #005EA2; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#005EA2; margin-bottom:6px;'>ℹ️ INFO</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>High Single-Page Sessions</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Over 40% of sessions view only one page.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Improve internal linking and calls-to-action.</div>
+			</div>",
+			"")
+			
+			VAR EmptyState = 
+			IF(BounceHigh + EngagementLow + SinglePageHigh = 0,
+			"<div style='background:#F8F9FA; border:1px solid #DFE1E2; padding:12px; border-radius:6px;'>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>No review flags for the selected period</div>
+			  <div style='font-size:11px; color:#565C65;'>Adjust date range or filters to explore patterns.</div>
+			</div>",
+			"")
+			
+			RETURN
+			Header & Card1 & Card2 & Card3 & EmptyState & "</div>"
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights\Page Actions
+		lineageTag: 278b68c4-92ef-4a6c-b7a9-fcb471de28c3
+
+	/// Actions for Play Events
+	measure 'Actions - Play Events Page' = ```
+			VAR DropOff = [Signal - Video Drop-off Spike?]
+			VAR CompletionLow = [Signal - Completion Rate Below Industry?]
+			VAR WatchTimeDown = [Signal - Watch Time Declining?]
+			
+			VAR Header = 
+			"<div style='font-family:Segoe UI;'>
+			  <div style='font-size:14px; font-weight:600; color:#1B1B1B; margin-bottom:10px;'>
+			    Areas to Review
+			  </div>"
+			
+			VAR Card1 = 
+			IF(DropOff = 1,
+			"<div style='background:#FFF1F0; border-left:4px solid #D83933; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#D83933; margin-bottom:6px;'>🎬 REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Video Drop-off Detected</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: More than 30% drop-off before play completion.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Review video content at common drop-off points.</div>
+			</div>",
+			"")
+			
+			VAR Card2 = 
+			IF(CompletionLow = 1,
+			"<div style='background:#FFF8E6; border-left:4px solid #FFBE2E; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#FFBE2E; margin-bottom:6px;'>▶️ REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Completion Rate Below Industry</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Completion rate under 45% (industry avg 45-55%).</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Shorten video length or improve pacing.</div>
+			</div>",
+			"")
+			
+			VAR Card3 = 
+			IF(WatchTimeDown = 1,
+			"<div style='background:#E7F2E8; border-left:4px solid #005EA2; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#005EA2; margin-bottom:6px;'>⏱️ INFO</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Watch Time Declining</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Watch time decreased >10% month-over-month.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Compare content quality vs. previous period.</div>
+			</div>",
+			"")
+			
+			VAR EmptyState = 
+			IF(DropOff + CompletionLow + WatchTimeDown = 0,
+			"<div style='background:#F8F9FA; border:1px solid #DFE1E2; padding:12px; border-radius:6px;'>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>No review flags for the selected period</div>
+			  <div style='font-size:11px; color:#565C65;'>Adjust date range or filters to explore patterns.</div>
+			</div>",
+			"")
+			
+			RETURN
+			Header & Card1 & Card2 & Card3 & EmptyState & "</div>"
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights\Page Actions
+		lineageTag: f33babc8-58f1-46d5-8543-6142509e303f
+
+	/// Actions for Search
+	measure 'Actions - External Search Page' = ```
+			VAR CTRLow = [Signal - CTR Below Potential?]
+			VAR PositionDrop = [Signal - Position Drop?]
+			VAR ImpressionNoClick = [Signal - Impression Spike No Clicks?]
+			
+			VAR Header = 
+			"<div style='font-family:Segoe UI;'>
+			  <div style='font-size:14px; font-weight:600; color:#1B1B1B; margin-bottom:10px;'>
+			    Areas to Review
+			  </div>"
+			
+			VAR Card1 = 
+			IF(CTRLow = 1,
+			"<div style='background:#FFF1F0; border-left:4px solid #D83933; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#D83933; margin-bottom:6px;'>🔍 REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>CTR Below Potential</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Good position (<10) but CTR under 5%.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Improve meta titles and descriptions.</div>
+			</div>",
+			"")
+			
+			VAR Card2 = 
+			IF(PositionDrop = 1,
+			"<div style='background:#FFF8E6; border-left:4px solid #FFBE2E; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#FFBE2E; margin-bottom:6px;'>📉 REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Position Dropped Off Page 1</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Average position is now >10.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Audit content freshness and competitor rankings.</div>
+			</div>",
+			"")
+			
+			VAR Card3 = 
+			IF(ImpressionNoClick = 1,
+			"<div style='background:#E7F2E8; border-left:4px solid #005EA2; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#005EA2; margin-bottom:6px;'>📊 INFO</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>High Impressions, Low Clicks</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: >1000 impressions but CTR under 2%.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Review search intent match for top queries.</div>
+			</div>",
+			"")
+			
+			VAR EmptyState = 
+			IF(CTRLow + PositionDrop + ImpressionNoClick = 0,
+			"<div style='background:#F8F9FA; border:1px solid #DFE1E2; padding:12px; border-radius:6px;'>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>No review flags for the selected period</div>
+			  <div style='font-size:11px; color:#565C65;'>Adjust date range or filters to explore patterns.</div>
+			</div>",
+			"")
+			
+			RETURN
+			Header & Card1 & Card2 & Card3 & EmptyState & "</div>"
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights\Page Actions
+		lineageTag: 0d8e2600-46fb-4664-a094-76a13dfe9b9f
+
+	/// Actions for AI Insights
+	measure 'Actions - AI Insights Page' = ```
+			VAR AnomalyDetected = [Signal - Anomaly Detected?]
+			VAR ForecastLow = [Signal - Forecast Confidence Low?]
+			VAR InsufficientData = [Signal - Insufficient Data?]
+			
+			VAR Header = 
+			"<div style='font-family:Segoe UI;'>
+			  <div style='font-size:14px; font-weight:600; color:#1B1B1B; margin-bottom:10px;'>
+			    Areas to Review
+			  </div>"
+			
+			VAR Card1 = 
+			IF(AnomalyDetected = 1,
+			"<div style='background:#FFF1F0; border-left:4px solid #D83933; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#D83933; margin-bottom:6px;'>⚡ REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Anomaly Detected</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Sessions are >3 standard deviations from baseline.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Validate data quality and identify root cause.</div>
+			</div>",
+			"")
+			
+			VAR Card2 = 
+			IF(ForecastLow = 1,
+			"<div style='background:#FFF8E6; border-left:4px solid #FFBE2E; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#FFBE2E; margin-bottom:6px;'>📊 REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Forecast Confidence Low</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Less than 60 days of data for reliable forecasting.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Extend date range or wait for more data.</div>
+			</div>",
+			"")
+			
+			VAR Card3 = 
+			IF(InsufficientData = 1,
+			"<div style='background:#E7F2E8; border-left:4px solid #005EA2; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#005EA2; margin-bottom:6px;'>ℹ️ INFO</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Insufficient Historical Data</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Less than 30 days of data available.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> AI features require 30+ days for accuracy.</div>
+			</div>",
+			"")
+			
+			VAR EmptyState = 
+			IF(AnomalyDetected + ForecastLow + InsufficientData = 0,
+			"<div style='background:#F8F9FA; border:1px solid #DFE1E2; padding:12px; border-radius:6px;'>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>No review flags for the selected period</div>
+			  <div style='font-size:11px; color:#565C65;'>AI models are operating within normal parameters.</div>
+			</div>",
+			"")
+			
+			RETURN
+			Header & Card1 & Card2 & Card3 & EmptyState & "</div>"
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights\Page Actions
+		lineageTag: 25f07fba-898e-4657-b274-1dc291df4686
+
+	/// Actions for Deep Dive
+	measure 'Actions - Deep Dive Page' = ```
+			VAR SegmentHigh = [Signal - Segment Outperformance?]
+			VAR CohortDrop = [Signal - Cohort Retention Drop?]
+			
+			VAR Header = 
+			"<div style='font-family:Segoe UI;'>
+			  <div style='font-size:14px; font-weight:600; color:#1B1B1B; margin-bottom:10px;'>
+			    Areas to Review
+			  </div>"
+			
+			VAR Card1 = 
+			IF(SegmentHigh = 1,
+			"<div style='background:#FFF1F0; border-left:4px solid #D83933; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#D83933; margin-bottom:6px;'>🎯 REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>High-Performing Segment Detected</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: A segment outperforms average by >30%.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Analyze segment traits for replication opportunities.</div>
+			</div>",
+			"")
+			
+			VAR Card2 = 
+			IF(CohortDrop = 1,
+			"<div style='background:#FFF8E6; border-left:4px solid #FFBE2E; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#FFBE2E; margin-bottom:6px;'>📉 REVIEW</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Cohort Retention Declining</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Signal: Return rate dropped >20% month-over-month.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Suggested check:</span> Review content freshness and re-engagement strategy.</div>
+			</div>",
+			"")
+			
+			VAR Card3 = 
+			"<div style='background:#E7F2E8; border-left:4px solid #005EA2; padding:12px; margin-bottom:8px; border-radius:6px;'>
+			  <div style='font-size:11px; font-weight:700; color:#005EA2; margin-bottom:6px;'>🔬 INFO</div>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>Deep Dive Features</div>
+			  <div style='font-size:11px; color:#565C65; margin-bottom:6px;'>Use Decomposition Tree to discover patterns.</div>
+			  <div style='font-size:11px; color:#565C65;'><span style='font-weight:600; color:#3D4551;'>Tip:</span> Cohort analysis requires GA4 BigQuery user_pseudo_id export.</div>
+			</div>"
+			
+			VAR EmptyState = 
+			IF(SegmentHigh + CohortDrop = 0,
+			"<div style='background:#F8F9FA; border:1px solid #DFE1E2; padding:12px; border-radius:6px;'>
+			  <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>No review flags for the selected period</div>
+			  <div style='font-size:11px; color:#565C65;'>Explore segments using the decomposition tree.</div>
+			</div>",
+			"")
+			
+			RETURN
+			Header & Card1 & Card2 & Card3 & EmptyState & "</div>"
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights\Page Actions
+		lineageTag: cd423458-67d7-414d-a9bf-7b7f635d0981
+
+	/// Total sessions (alternate)
+	measure 'Total Sessions' = SUM('ga4-daily'[Sessions])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: 88c1d763-940b-47ce-92a6-bfb4e43401da
+
+	/// Total views (alternate)
+	measure 'Total Views' = SUM('ga4-daily'[Views])
+		formatString: #,##0
+		displayFolder: 01 - KPI Cards
+		lineageTag: 517c33e2-fe0e-4e6d-999e-0cdd62592ac9
+
+	/// Total engaged sessions
+	measure 'Engaged Sessions' = SUM('ga4-daily'[Engaged sessions])
+		formatString: #,##0
+		displayFolder: 07 - Engagement
+		lineageTag: 3b52d822-4e71-4d56-b5bc-774d44256478
+
+	/// Average engagement rate
+	measure 'Avg Engagement Rate' = AVERAGE('ga4-daily'[Engagement rate])
+		formatString: 0.0%
+		displayFolder: 07 - Engagement
+		lineageTag: 072ed875-8992-4d6a-99bd-34d91edd116e
+
+	/// Google Search clicks
+	measure 'GSC Clicks' = SUM('gsc-chart'[Clicks])
+		formatString: #,##0
+		displayFolder: 06 - Search Console
+		lineageTag: b2282fd8-6c41-4997-a332-40ce351433a8
+
+	/// Google Search impressions
+	measure 'GSC Impressions' = SUM('gsc-chart'[Impressions])
+		formatString: #,##0
+		displayFolder: 06 - Search Console
+		lineageTag: 1548458d-f04e-4abd-a157-9a7827e2da19
+
+	/// Google Search CTR
+	measure 'GSC CTR' = DIVIDE([GSC Clicks], [GSC Impressions], 0)
+		formatString: 0.00%
+		displayFolder: 06 - Search Console
+		lineageTag: 0e35655a-231a-42a0-92f8-6eb3974bdca2
+
+	/// Google Search avg position
+	measure 'GSC Avg Position' = AVERAGE('gsc-chart'[Position])
+		formatString: 0.0
+		displayFolder: 06 - Search Console
+		lineageTag: 16085d1e-881c-4840-a15a-8183188b5377
+
+	/// Actions for Traffic
+	measure 'Actions - Traffic Page' = ```
+			VAR BounceHigh = [Signal - Bounce Rate Elevated?]
+			VAR EngagementLow = [Signal - Engagement Below Average?]
+			VAR SinglePageHigh = [Signal - Single Page Sessions High?]
+			
+			RETURN
+			"HIGH: " & 
+			    IF(BounceHigh, "Bounce rate exceeds 50% threshold", "Traffic channels performing normally") & 
+			UNICHAR(10) &
+			"MEDIUM: " & 
+			    IF(EngagementLow, "Average session duration below 2 minutes", "Engagement levels healthy") &
+			UNICHAR(10) &
+			"INFO: " & 
+			    IF(SinglePageHigh, "Single page sessions exceed 40%", "Multi-page navigation normal")
+			```
+		formatString: @
+		displayFolder: 10 - AI Insights\Page Actions
+		lineageTag: df82162c-e975-46b1-a7cc-04ffce108253
+
+	/// Sessions MoM (Dec vs Nov)
+	measure 'Sessions - MoM % (Latest Month)' =
+			// Compare latest COMPLETE month vs prior month
+			// (Jan 2026 is partial, so compare Dec 2025 vs Nov 2025)
+			VAR LatestDate = MAX(DimDate[Date])
+			VAR LatestCompleteMonthStart = EOMONTH(LatestDate, -2) + 1
+			VAR LatestCompleteMonthEnd = EOMONTH(LatestDate, -1)
+			VAR PriorMonthStart = EOMONTH(LatestDate, -3) + 1
+			VAR PriorMonthEnd = EOMONTH(LatestDate, -2)
+			VAR LatestMonthSessions = CALCULATE(
+			    [Sessions],
+			    REMOVEFILTERS(DimDate),
+			    DimDate[Date] >= LatestCompleteMonthStart && DimDate[Date] <= LatestCompleteMonthEnd
+			)
+			VAR PriorMonthSessions = CALCULATE(
+			    [Sessions],
+			    REMOVEFILTERS(DimDate),
+			    DimDate[Date] >= PriorMonthStart && DimDate[Date] <= PriorMonthEnd
+			)
+			RETURN
+			IF(
+			    NOT ISBLANK(PriorMonthSessions) && PriorMonthSessions <> 0,
+			    DIVIDE(LatestMonthSessions - PriorMonthSessions, PriorMonthSessions),
+			    BLANK()
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 53a4dc53-a1f0-4f89-810e-f7b331682b2c
+
+	/// Sessions MoM label (Dec vs Nov)
+	measure 'Sessions - MoM Label (Latest Month)' =
+			VAR MoMValue = [Sessions - MoM % (Latest Month)]
+			VAR Arrow = IF(MoMValue > 0, "▲", IF(MoMValue < 0, "▼", "►"))
+			VAR Pct = FORMAT(ABS(MoMValue), "0%")
+			RETURN
+			IF(NOT ISBLANK(MoMValue), Arrow & " " & Pct & " MoM", "--")
+		formatString: @
+		displayFolder: 99 - Utility\KPI Labels
+		lineageTag: b6865d02-1db1-44e9-ac86-5b011c68fd09
+
+	/// Page Views MoM (Dec vs Nov)
+	measure 'Page Views - MoM % (Latest Month)' =
+			VAR LatestDate = MAX(DimDate[Date])
+			VAR LatestCompleteMonthStart = EOMONTH(LatestDate, -2) + 1
+			VAR LatestCompleteMonthEnd = EOMONTH(LatestDate, -1)
+			VAR PriorMonthStart = EOMONTH(LatestDate, -3) + 1
+			VAR PriorMonthEnd = EOMONTH(LatestDate, -2)
+			VAR LatestMonthValue = CALCULATE(
+			    [Page Views],
+			    REMOVEFILTERS(DimDate),
+			    DimDate[Date] >= LatestCompleteMonthStart && DimDate[Date] <= LatestCompleteMonthEnd
+			)
+			VAR PriorMonthValue = CALCULATE(
+			    [Page Views],
+			    REMOVEFILTERS(DimDate),
+			    DimDate[Date] >= PriorMonthStart && DimDate[Date] <= PriorMonthEnd
+			)
+			RETURN
+			IF(
+			    NOT ISBLANK(PriorMonthValue) && PriorMonthValue <> 0,
+			    DIVIDE(LatestMonthValue - PriorMonthValue, PriorMonthValue),
+			    BLANK()
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: d77654b8-be7b-4fa8-90bd-7e3a7c592715
+
+	/// Page Views MoM label (Dec vs Nov)
+	measure 'Page Views - MoM Label (Latest Month)' =
+			VAR MoMValue = [Page Views - MoM % (Latest Month)]
+			VAR Arrow = IF(MoMValue > 0, "▲", IF(MoMValue < 0, "▼", "►"))
+			VAR Pct = FORMAT(ABS(MoMValue), "0%")
+			RETURN
+			IF(NOT ISBLANK(MoMValue), Arrow & " " & Pct & " MoM", "--")
+		formatString: @
+		displayFolder: 99 - Utility\KPI Labels
+		lineageTag: 2114baeb-57e4-435b-9a7f-94f5f68918ad
+
+	/// Avg Pages MoM (Dec vs Nov)
+	measure 'Avg Pages - MoM % (Latest Month)' =
+			VAR LatestDate = MAX(DimDate[Date])
+			VAR LatestCompleteMonthStart = EOMONTH(LatestDate, -2) + 1
+			VAR LatestCompleteMonthEnd = EOMONTH(LatestDate, -1)
+			VAR PriorMonthStart = EOMONTH(LatestDate, -3) + 1
+			VAR PriorMonthEnd = EOMONTH(LatestDate, -2)
+			VAR LatestMonthValue = CALCULATE(
+			    [Avg Pages per Session],
+			    REMOVEFILTERS(DimDate),
+			    DimDate[Date] >= LatestCompleteMonthStart && DimDate[Date] <= LatestCompleteMonthEnd
+			)
+			VAR PriorMonthValue = CALCULATE(
+			    [Avg Pages per Session],
+			    REMOVEFILTERS(DimDate),
+			    DimDate[Date] >= PriorMonthStart && DimDate[Date] <= PriorMonthEnd
+			)
+			RETURN
+			IF(
+			    NOT ISBLANK(PriorMonthValue) && PriorMonthValue <> 0,
+			    DIVIDE(LatestMonthValue - PriorMonthValue, PriorMonthValue),
+			    BLANK()
+			)
+		formatString: 0.0%
+		displayFolder: 08 - Time Intelligence
+		lineageTag: 642247fb-e2d0-40e0-97f2-a5c084476f8e
+
+	/// Avg Pages MoM label (Dec vs Nov)
+	measure 'Avg Pages - MoM Label (Latest Month)' =
+			VAR MoMValue = [Avg Pages - MoM % (Latest Month)]
+			VAR Arrow = IF(MoMValue > 0, "▲", IF(MoMValue < 0, "▼", "►"))
+			VAR Pct = FORMAT(ABS(MoMValue), "0%")
+			RETURN
+			IF(NOT ISBLANK(MoMValue), Arrow & " " & Pct & " MoM", "--")
+		formatString: @
+		displayFolder: 99 - Utility\KPI Labels
+		lineageTag: d19077de-741e-42e8-b976-6445a87ca0b5
+
+	/// Sessions MoM color (Dec vs Nov)
+	measure 'Sessions - MoM Color (Latest Month)' =
+			VAR Delta = [Sessions - MoM % (Latest Month)]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    Delta > 0.005, "#2E7D32",
+			    Delta < -0.005, "#C62828",
+			    "#9E9E9E"
+			)
+		formatString: @
+		displayFolder: 99 - Utility\KPI Colors
+		lineageTag: 4914c3a9-1c69-4c83-a65e-772a735fe650
+
+	/// Page Views MoM color (Dec vs Nov)
+	measure 'Page Views - MoM Color (Latest Month)' =
+			VAR Delta = [Page Views - MoM % (Latest Month)]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    Delta > 0.005, "#2E7D32",
+			    Delta < -0.005, "#C62828",
+			    "#9E9E9E"
+			)
+		formatString: @
+		displayFolder: 99 - Utility\KPI Colors
+		lineageTag: 66e0375c-e98c-4ac4-8c86-71d4590d8ae7
+
+	/// Avg Pages MoM color (Dec vs Nov)
+	measure 'Avg Pages - MoM Color (Latest Month)' =
+			VAR Delta = [Avg Pages - MoM % (Latest Month)]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    Delta > 0.005, "#2E7D32",
+			    Delta < -0.005, "#C62828",
+			    "#9E9E9E"
+			)
+		formatString: @
+		displayFolder: 99 - Utility\KPI Colors
+		lineageTag: 1f7c8fc6-3310-4c88-ae4d-603ea5a05822
+
+	/// Sessions signal text for status bar
+	measure 'Signal Sessions Text' =
+			VAR IsActive = [Signal - Sessions MoM Drop?]
+			RETURN
+			IF(
+			    IsActive = 1,
+			    "● Sessions down >10% MoM",
+			    "○ Sessions MoM OK"
+			)
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: 4b1320af-6e72-437b-a95c-3c8122753f28
+
+	/// Mobile signal text for status bar - uses livecast-specific device data
+	measure 'Signal Mobile Text' =
+			VAR IsActive = [Signal - Mobile Share Elevated?]
+			VAR MobilePercent = FORMAT([Mobile Share %], "0%")
+			RETURN
+			IF(
+			    IsActive = 1,
+			    "● Mobile " & MobilePercent & " of live traffic",
+			    "○ Mobile share normal"
+			)
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: c2cc13ba-afdb-44e7-bfd4-e26bde74b0c1
+
+	/// Bounce rate signal text for status bar
+	measure 'Signal Bounce Text' =
+			VAR IsActive = [Signal - Bounce Rate Elevated?]
+			RETURN
+			IF(
+			    IsActive = 1,
+			    "● Bounce rate >50%",
+			    "○ Bounce rate OK"
+			)
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: 8416505a-2da2-4590-bda8-809912338b64
+
+	/// Play rate signal text for status bar
+	measure 'Signal Play Text' =
+			VAR IsActive = [Signal - Play Rate Opportunity?]
+			RETURN
+			IF(
+			    IsActive = 1,
+			    "● Play rate <30% - opportunity",
+			    "○ Play rate healthy"
+			)
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: bedc0a96-a133-4f28-a7df-95879f1f1445
+
+	/// Sessions signal color (red if alert, green if OK)
+	measure 'Signal Sessions Color' = IF([Signal - Sessions MoM Drop?] = 1, "#C62828", "#2E7D32")
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: 78ff6c7f-a758-42c1-8257-9d6fd5a5400d
+
+	/// Mobile signal color (orange if elevated, green if OK)
+	measure 'Signal Mobile Color' = IF([Signal - Mobile Share Elevated?] = 1, "#F57C00", "#2E7D32")
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: 83be1a75-68f2-489a-b059-0d4f9723d052
+
+	/// Bounce signal color (red if alert, green if OK)
+	measure 'Signal Bounce Color' = IF([Signal - Bounce Rate Elevated?] = 1, "#C62828", "#2E7D32")
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: 7bc905a3-a5f9-4497-a9e5-53bb9ad82eef
+
+	/// Play rate signal color (orange if opportunity, green if OK)
+	measure 'Signal Play Color' = IF([Signal - Play Rate Opportunity?] = 1, "#F57C00", "#2E7D32")
+		formatString: @
+		displayFolder: 10 - AI Insights\Signal Text
+		lineageTag: cd55b66a-5efb-470a-b1d2-fd598b9ee3af
+
+	/// Tooltip summary for Explorer matrix row hover
+	measure 'TT - Explorer Row Summary' = ```
+			VAR RowSessions = [Sessions]
+			VAR RowViews = [Page Views]
+			VAR RowUsers = [Total Users]
+			VAR RowEngagement = [Engagement Rate]
+			RETURN
+			"Sessions: " & FORMAT(RowSessions, "#,##0") & 
+			" | Views: " & FORMAT(RowViews, "#,##0") &
+			" | Users: " & FORMAT(RowUsers, "#,##0") &
+			" | Engagement: " & FORMAT(RowEngagement, "0.0%")
+			```
+		formatString: @
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: 764e16bc-0f1f-4e49-a832-e09e943a13c0
+
+	/// Tooltip trend indicator for Explorer matrix row
+	measure 'TT - Explorer Row Trend' =
+			VAR MoMChange = [Sessions - MoM %]
+			RETURN
+			IF(
+			    ISBLANK(MoMChange),
+			    "Trend: No prior data",
+			    "MoM: " & FORMAT(MoMChange, "+0.0%;-0.0%;0.0%")
+			)
+		formatString: @
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: 2ba33a0b-12dd-4f32-9a44-be8d65fba53a
+
+	/// Query clicks for External Search tooltip
+	measure 'TT - Query Clicks' = SUM('gsc-queries'[Clicks])
+		formatString: #,##0
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: f5b23b9f-c66f-44e4-ab75-bb787d980ca2
+
+	/// Query impressions for External Search tooltip
+	measure 'TT - Query Impressions' = SUM('gsc-queries'[Impressions])
+		formatString: #,##0
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: 0426c287-cff0-4f18-8507-c9675b449285
+
+	/// Query CTR for External Search tooltip
+	measure 'TT - Query CTR' = DIVIDE([TT - Query Clicks], [TT - Query Impressions], 0)
+		formatString: 0.00%
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: 2dfb1176-6272-4251-b4df-8758c73f2193
+
+	/// Query avg position for External Search tooltip
+	measure 'TT - Query Position' = AVERAGE('gsc-queries'[Position])
+		formatString: 0.0
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: 2514b7c7-2f50-4fd4-945d-4863e15fc764
+
+	/// Complete query summary for External Search tooltip
+	measure 'TT - Query Performance Summary' =
+			VAR Clicks = [TT - Query Clicks]
+			VAR Impressions = [TT - Query Impressions]
+			VAR CTR = [TT - Query CTR]
+			VAR Position = [TT - Query Position]
+			RETURN
+			"Clicks: " & FORMAT(Clicks, "#,##0") &
+			" | Impressions: " & FORMAT(Impressions, "#,##0") &
+			" | CTR: " & FORMAT(CTR, "0.00%") &
+			" | Avg Position: " & FORMAT(Position, "0.0")
+		formatString: @
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: 6752d027-1ddc-4aa7-8978-c9aa53af95ca
+
+	/// CTR assessment with recommendation for tooltip
+	measure 'TT - Query CTR Assessment' =
+			VAR CTR = [TT - Query CTR]
+			VAR Position = [TT - Query Position]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    CTR >= 0.10, "✅ Excellent CTR (" & FORMAT(CTR, "0.0%") & ")",
+			    CTR >= 0.05, "✔️ Good CTR (" & FORMAT(CTR, "0.0%") & ")",
+			    Position <= 3 && CTR < 0.05, "⚠️ Low CTR for top position - check title/description",
+			    CTR >= 0.02, "➡️ Average CTR (" & FORMAT(CTR, "0.0%") & ")",
+			    "❌ Below average CTR - optimization needed"
+			)
+		formatString: @
+		displayFolder: 99 - Utility\Tooltips
+		lineageTag: 95e6c628-ba2d-4bc2-a43f-0d79ab0f9c04
+
+	column Dummy
+		isHidden
+		lineageTag: b8420623-5c8e-48b2-8608-ab8d810cfdd1
+		isNameInferred
+		sourceColumn: [Dummy]
+
+	partition Measures_Livecast = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Dummy", INTEGER,
+				    {
+				        {1}
+				    }
+				)
+

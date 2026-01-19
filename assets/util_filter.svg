@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Filter funnel with data flow -->
+  <!-- Top funnel opening -->
+  <line stroke="#005EA2" stroke-width="1.5" x1="3" y1="4" x2="21" y2="4"/>
+  <!-- Funnel sides -->
+  <line stroke="#005EA2" stroke-width="1.5" x1="3" y1="4" x2="9" y2="11"/>
+  <line stroke="#005EA2" stroke-width="1.5" x1="21" y1="4" x2="15" y2="11"/>
+  <!-- Filter chamber -->
+  <rect fill="none" stroke="#005EA2" stroke-width="1.5" x="9" y="11" width="6" height="6" rx="0.5"/>
+  <!-- Filtered output -->
+  <line stroke="#005EA2" stroke-width="1.5" x1="11" y1="17" x2="11" y2="21"/>
+  <line stroke="#005EA2" stroke-width="1.5" x1="13" y1="17" x2="13" y2="21"/>
+  <!-- Data particles being filtered -->
+  <circle fill="#005EA2" cx="7" cy="6" r="0.8"/>
+  <circle fill="#005EA2" cx="12" cy="7" r="0.8"/>
+  <circle fill="#005EA2" cx="17" cy="6" r="0.8"/>
+  <circle fill="#005EA2" cx="10" cy="8" r="0.6"/>
+  <circle fill="#005EA2" cx="14" cy="8" r="0.6"/>
+  <!-- Filtered result -->
+  <circle fill="#005EA2" cx="12" cy="14" r="1"/>
+</svg>

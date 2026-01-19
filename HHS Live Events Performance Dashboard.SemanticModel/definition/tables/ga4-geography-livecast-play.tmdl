@@ -1,0 +1,143 @@
+/// GA4 geography (play events)
+table ga4-geography-livecast-play
+	lineageTag: 845a8690-a918-41ba-ae7f-946d363626b2
+
+	column Country
+		dataType: string
+		lineageTag: 6761032d-7ce5-4b91-975b-cbd38b3ab2be
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: e1fbd54e-26cc-4506-b95c-84a96b5abca6
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 51e4d8f9-36eb-4d2b-8977-524330c2c8ce
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: 5964f163-2010-4a0f-8198-cdd7ab4c974c
+		summarizeBy: sum
+		sourceColumn: Sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6f7ccba1-e7de-4734-8d2c-2b5bd21e8fd7
+		summarizeBy: sum
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column Views
+		dataType: int64
+		formatString: 0
+		lineageTag: 4d28b725-2b83-4fbc-a0ec-3e9361361cc0
+		summarizeBy: sum
+		sourceColumn: Views
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column1
+		dataType: string
+		lineageTag: 37411a57-c930-4f32-a7aa-67b1dfff7a58
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Disambiguated location for Azure Maps (livecast play events)
+	column GeoLabel = [City] & ", " & [Region] & ", " & [Country]
+		dataType: string
+		lineageTag: fdb80e02-d42e-4d75-b105-9f14fbfc145b
+
+	partition ga4-geography-livecast-play = m
+		mode: import
+		source =
+				let
+				    // Base load - inline to avoid cyclic reference
+				    FilePath = pDatasetsFolder & "ga4-geography-livecast-play.csv",
+				    RawSource = Csv.Document(File.Contents(FilePath), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    SkippedMeta = Table.Skip(RawSource, 6),
+				    Source = Table.PromoteHeaders(SkippedMeta, [PromoteAllScalars=true]),
+				
+				    #"Trimmed Text" =
+				        Table.TransformColumns(
+				            Source,
+				            {
+				                {"Country", each if _ = null then null else Text.Trim(Text.From(_)), type text},
+				                {"Region",  each if _ = null then null else Text.Trim(Text.From(_)), type text},
+				                {"City",    each if _ = null then null else Text.Trim(Text.From(_)), type text}
+				            }
+				        ),
+				
+				    #"Filtered Rows" =
+				        Table.SelectRows(
+				            #"Trimmed Text",
+				            each
+				                [Country] <> null and [Country] <> "" and [Country] <> "(not set)" and
+				                [Region]  <> null and [Region]  <> "" and [Region]  <> "(not set)" and
+				                [City]    <> null and [City]    <> "" and [City]    <> "(not set)"
+				        ),
+				
+				    #"Converted Numbers" =
+				        Table.TransformColumns(
+				            #"Filtered Rows",
+				            {
+				                {
+				                    "Sessions",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Total users",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Views",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                }
+				            }
+				        ),
+				
+				    #"Removed Column1" = Table.RemoveColumns(#"Converted Numbers", {"Column1"}, MissingField.Ignore),
+				
+				    #"Reordered Columns" =
+				        Table.ReorderColumns(
+				            #"Removed Column1",
+				            {"Country", "Region", "City", "Sessions", "Total users", "Views"},
+				            MissingField.Ignore
+				        )
+				in
+				    #"Reordered Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

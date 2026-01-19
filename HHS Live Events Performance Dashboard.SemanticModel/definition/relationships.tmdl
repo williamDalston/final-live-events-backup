@@ -1,0 +1,32 @@
+relationship Rel_gscchart_to_DimDate
+	fromColumn: gsc-chart.Date
+	toColumn: DimDate.Date
+
+relationship Rel_ga4daily_to_DimDate
+	fromColumn: ga4-daily.Date
+	toColumn: DimDate.Date
+
+relationship Rel_DimDevice_ga4dailydevice
+	fromColumn: ga4-daily-device.deviceCategory
+	toColumn: DimDevice.deviceCategory
+
+relationship Rel_DimGeography_ga4geography
+	fromColumn: ga4-geography.GeoKey
+	toColumn: DimGeography.GeoKey
+
+relationship Rel_DimSource_ga4trafficsource
+	fromColumn: ga4-traffic-source.SourceKey
+	toColumn: DimSource.SourceKey
+
+relationship Rel_ga4dailydevice_DimDate
+	fromColumn: ga4-daily-device.date
+	toColumn: DimDate.Date
+
+relationship Rel_ga4titles_DimLivecast
+	fromColumn: ga4-titles.'Page Title (Clean)'
+	toColumn: DimLivecast.livecast_title
+
+relationship Rel_ga4pages_DimLivecast
+	fromColumn: ga4-pages.'Page Title (Clean)'
+	toColumn: DimLivecast.livecast_title
+

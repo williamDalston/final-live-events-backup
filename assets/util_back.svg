@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Back/Return button - arrow in circle for drillthrough -->
+  <!-- Outer circle -->
+  <circle fill="none" stroke="#005EA2" stroke-width="1.8" cx="12" cy="12" r="9"/>
+  <!-- Arrow pointing left (back) -->
+  <path fill="none" stroke="#005EA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M 15 6 L 9 12 L 15 18"/>
+  <!-- Reinforcement line -->
+  <line stroke="#005EA2" stroke-width="2" stroke-linecap="round" x1="9" y1="12" x2="16" y2="12"/>
+</svg>

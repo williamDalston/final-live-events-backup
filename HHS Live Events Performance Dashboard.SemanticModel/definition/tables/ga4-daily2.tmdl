@@ -1,0 +1,84 @@
+table ga4-daily2
+	lineageTag: 7c6668fd-3743-4995-ab01-d3aedeec1902
+
+	column Date
+		dataType: int64
+		formatString: 0
+		lineageTag: 73b2dfa8-79ab-4fee-8c54-bb513adb37b9
+		summarizeBy: sum
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Views
+		dataType: int64
+		formatString: 0
+		lineageTag: 78ca299f-e7c5-4e0f-a2f7-9f966ee52c89
+		summarizeBy: sum
+		sourceColumn: Views
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: 5369835e-8056-4f3e-82f0-3f4cb14fd187
+		summarizeBy: sum
+		sourceColumn: Sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: 46fa6d39-6bbd-4538-b51e-6a03c9aabe94
+		summarizeBy: none
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Engaged sessions'
+		dataType: int64
+		formatString: 0
+		lineageTag: 50de9400-16e5-4f8a-9c85-a294cc9f29de
+		summarizeBy: sum
+		sourceColumn: Engaged sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Engagement rate'
+		dataType: double
+		lineageTag: c71262d5-c0ed-4417-98d8-588f75a8e36d
+		summarizeBy: sum
+		sourceColumn: Engagement rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column1
+		dataType: string
+		lineageTag: 8518610f-fd99-4e72-809d-ec6e0cc863f4
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ga4-daily2 = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\farad\Dev\WORK\HHS\repos\auto-the-big-one\dashboards\01_Live_Events_Dashboard\datasets\ga4-daily2.csv"),[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}, {"Column6", type text}, {"Column7", type text}}),
+				    #"Removed Top Rows" = Table.Skip(#"Changed Type",6),
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Removed Top Rows", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"Date", Int64.Type}, {"Views", Int64.Type}, {"Sessions", Int64.Type}, {"Total users", Int64.Type}, {"Engaged sessions", Int64.Type}, {"Engagement rate", type number}, {"", type text}}),
+				    #"Removed Top Rows1" = Table.Skip(#"Changed Type1",1),
+				    #"Removed Blank Rows" = Table.SelectRows(#"Removed Top Rows1", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null})))
+				in
+				    #"Removed Blank Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

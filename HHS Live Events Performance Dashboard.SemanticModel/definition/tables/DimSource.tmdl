@@ -1,0 +1,28 @@
+/// Traffic source dimension - stable reference for slicers
+table DimSource
+	lineageTag: f2945855-ecc7-4077-8e2e-e4304ba83636
+
+	column 'Traffic Source'
+		lineageTag: b8fd2e78-1992-43fd-86cf-0051bb653c82
+		isNameInferred
+		sourceColumn: ga4-traffic-source[Traffic Source]
+
+	column Medium
+		lineageTag: 74a33b97-4e1d-4ebd-a3a7-dc23f95d9ccf
+		isNameInferred
+		sourceColumn: ga4-traffic-source[Medium]
+
+	column SourceKey
+		isHidden
+		lineageTag: 94d97c25-c646-4aac-9ed0-b7718a8a0da5
+		isNameInferred
+		sourceColumn: [SourceKey]
+
+	partition DimSource = calculated
+		mode: import
+		source =
+				ADDCOLUMNS(
+				    SUMMARIZE('ga4-traffic-source', 'ga4-traffic-source'[Traffic Source], 'ga4-traffic-source'[Medium]),
+				    "SourceKey", 'ga4-traffic-source'[Traffic Source] & "|" & 'ga4-traffic-source'[Medium]
+				)
+

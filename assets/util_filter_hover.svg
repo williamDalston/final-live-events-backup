@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Hover state: Active filtering -->
+  <!-- Top funnel opening - brighter -->
+  <line stroke="#4A90E2" stroke-width="1.8" x1="3" y1="4" x2="21" y2="4"/>
+  <!-- Funnel sides -->
+  <line stroke="#4A90E2" stroke-width="1.8" x1="3" y1="4" x2="9" y2="11"/>
+  <line stroke="#4A90E2" stroke-width="1.8" x1="21" y1="4" x2="15" y2="11"/>
+  <!-- Filter chamber - highlighted -->
+  <rect fill="#4A90E2" fill-opacity="0.1" stroke="#4A90E2" stroke-width="1.8" x="9" y="11" width="6" height="6" rx="0.5"/>
+  <!-- Glow effect -->
+  <rect fill="none" stroke="#4A90E2" stroke-width="0.5" stroke-opacity="0.3" x="8" y="10" width="8" height="8" rx="0.5"/>
+  <!-- Filtered output -->
+  <line stroke="#4A90E2" stroke-width="1.8" x1="11" y1="17" x2="11" y2="21"/>
+  <line stroke="#4A90E2" stroke-width="1.8" x1="13" y1="17" x2="13" y2="21"/>
+  <!-- Data particles being filtered - more visible -->
+  <circle fill="#4A90E2" cx="7" cy="6" r="1"/>
+  <circle fill="#4A90E2" cx="12" cy="7" r="1"/>
+  <circle fill="#4A90E2" cx="17" cy="6" r="1"/>
+  <circle fill="#4A90E2" cx="10" cy="8" r="0.8"/>
+  <circle fill="#4A90E2" cx="14" cy="8" r="0.8"/>
+  <!-- Filtered result - larger -->
+  <circle fill="#4A90E2" cx="12" cy="14" r="1.3"/>
+</svg>

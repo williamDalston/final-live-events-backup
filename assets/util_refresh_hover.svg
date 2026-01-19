@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Hover state: Active refresh with rotation indication -->
+  <!-- Main refresh circle - brighter -->
+  <path fill="none" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"
+        d="M 4 12 A 8 8 0 0 1 19 8"/>
+  <path fill="none" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"
+        d="M 20 12 A 8 8 0 0 1 5 16"/>
+  <!-- Glow rings -->
+  <path fill="none" stroke="#4A90E2" stroke-width="0.5" stroke-opacity="0.3" stroke-linecap="round"
+        d="M 3 12 A 9 9 0 0 1 19.5 7"/>
+  <path fill="none" stroke="#4A90E2" stroke-width="0.5" stroke-opacity="0.3" stroke-linecap="round"
+        d="M 21 12 A 9 9 0 0 1 4.5 17"/>
+  <!-- Arrow heads - larger -->
+  <path fill="#4A90E2" d="M 19 8 L 17 6 L 20 5 L 21 8 Z"/>
+  <path fill="#4A90E2" d="M 5 16 L 7 18 L 4 19 L 3 16 Z"/>
+  <!-- Center sync indicator - pulsing -->
+  <circle fill="none" stroke="#4A90E2" stroke-width="1.5" cx="12" cy="12" r="3"/>
+  <circle fill="none" stroke="#4A90E2" stroke-width="0.5" stroke-opacity="0.3" cx="12" cy="12" r="4"/>
+  <circle fill="#4A90E2" cx="12" cy="12" r="1.2"/>
+</svg>

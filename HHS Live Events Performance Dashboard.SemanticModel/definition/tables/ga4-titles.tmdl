@@ -1,0 +1,117 @@
+/// GA4 page titles
+table ga4-titles
+	lineageTag: 9c78a04e-a74e-495c-af8d-a640d9b6e9a0
+
+	column 'Page title'
+		dataType: string
+		lineageTag: 2e7c3203-beb8-4e73-b16b-4652b8b81317
+		summarizeBy: none
+		sourceColumn: Page title
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event name'
+		dataType: string
+		lineageTag: 54c719c3-fbd8-422e-bc66-42b0b6b5c7f9
+		summarizeBy: none
+		sourceColumn: Event name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event count'
+		dataType: int64
+		formatString: 0
+		lineageTag: 54b07106-364b-44e2-ae86-f43b48fbb404
+		summarizeBy: none
+		sourceColumn: Event count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d947c3b-aefc-4867-a256-52c98d51a2e2
+		summarizeBy: none
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column1
+		dataType: string
+		lineageTag: 970b24da-01f2-41db-9806-542af85551a1
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Page title with suffix removed (e.g., ' | HHS.gov' stripped)
+	column 'Page Title (Clean)' =
+			VAR FullTitle = 'ga4-titles'[Page title]
+			VAR PipePos = SEARCH(" | ", FullTitle, 1, 0)
+			RETURN
+			IF(
+			    PipePos > 0,
+			    LEFT(FullTitle, PipePos - 1),
+			    FullTitle
+			)
+		dataType: string
+		lineageTag: d4ff5e09-4dc5-48b5-b86b-f7611d1e377b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ga4-titles = m
+		mode: import
+		source =
+				let
+				    FilePath = pDatasetsFolder & "ga4-titles.csv",
+				
+				    Raw =
+				        Csv.Document(
+				            File.Contents(FilePath),
+				            [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]
+				        ),
+				
+				    // ga4-titles DOES have GA4 metadata rows + an extra agg row after headers
+				    SkippedRows = Table.Skip(Raw, 6),
+				    PromotedHeaders = Table.PromoteHeaders(SkippedRows, [PromoteAllScalars=true]),
+				    CleanHeaders = Table.TransformColumnNames(PromotedHeaders, each Text.Trim(_)),
+				    SkippedAggRow = Table.Skip(CleanHeaders, 1),
+				
+				    // Remove extra trailing column if present
+				    RemovedColumn1 = Table.RemoveColumns(SkippedAggRow, {"Column1"}, MissingField.Ignore),
+				
+				    // Safe number conversion
+				    ToNumber = (x as any) as nullable number =>
+				        let
+				            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				            n = try Number.FromText(t) otherwise null
+				        in
+				            n,
+				
+				    // Convert the two critical columns
+				    Converted =
+				        Table.TransformColumns(
+				            RemovedColumn1,
+				            {
+				                {"Event count", each ToNumber(_), Int64.Type},
+				                {"Total users", each ToNumber(_), Int64.Type}
+				            }
+				        ),
+				
+				    // Optional: trim the text columns
+				    TrimmedText =
+				        Table.TransformColumns(
+				            Converted,
+				            {
+				                {"Page title", each if _ = null then null else Text.Trim(Text.From(_)), type text},
+				                {"Event name", each if _ = null then null else Text.Trim(Text.From(_)), type text}
+				            }
+				        )
+				in
+				    TrimmedText
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

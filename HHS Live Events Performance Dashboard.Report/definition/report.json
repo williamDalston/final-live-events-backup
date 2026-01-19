@@ -1,0 +1,109 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.0.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY25SU11",
+      "reportVersionAtImport": {
+        "visual": "2.4.0",
+        "report": "3.0.0",
+        "page": "2.3.0"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "HHS_USWDS_Light_Theme09836088166997692.json",
+      "reportVersionAtImport": {
+        "visual": "2.4.0",
+        "report": "3.0.0",
+        "page": "2.3.0"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "sankey_diagram_visiochart_8c1a6a012eec472d899f79bf867da012",
+    "sankey02300D1BE6F5427989F3DE31CCA9E0F32020",
+    "htmlContent443BE3AD55E043BF878BED274D3A6855"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY25SU11",
+          "path": "BaseThemes/CY25SU11.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "HHS_USWDS_Light_Theme09836088166997692.json",
+          "path": "HHS_USWDS_Light_Theme09836088166997692.json",
+          "type": "CustomTheme"
+        },
+        {
+          "name": "nav_01_command_center_active4597736745061509.svg",
+          "path": "nav_01_command_center_active4597736745061509.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_explorer898708090637734.svg",
+          "path": "nav_02_explorer898708090637734.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_03_traffic_acquisition5074784205486823.svg",
+          "path": "nav_03_traffic_acquisition5074784205486823.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_04_play_events5716670722268054.svg",
+          "path": "nav_04_play_events5716670722268054.svg",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "filterPaneHiddenInEditMode": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(dir /s /b \"c:\\\\Users\\\\farad\\\\OneDrive\\\\Desktop\\\\copy of all important documents\\\\HHS Live Events Performance Dashboard.Report\\\\definition\\\\pages\")",
+      "Bash(git init:*)"
+    ]
+  }
+}

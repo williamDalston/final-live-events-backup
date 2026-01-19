@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Hover state: Animated radar with brighter blue -->
+  <circle fill="none" stroke="#4A90E2" stroke-width="1.8" cx="12" cy="12" r="9"/>
+  <circle fill="none" stroke="#4A90E2" stroke-width="1.2" stroke-opacity="0.5" cx="12" cy="12" r="6"/>
+  <circle fill="none" stroke="#4A90E2" stroke-width="1.2" stroke-opacity="0.4" cx="12" cy="12" r="3"/>
+  <!-- Outer glow ring -->
+  <circle fill="none" stroke="#4A90E2" stroke-width="0.5" stroke-opacity="0.2" cx="12" cy="12" r="10"/>
+  <!-- Center dot - pulsing -->
+  <circle fill="#4A90E2" cx="12" cy="12" r="1.8"/>
+  <!-- Radar sweep arm - brighter -->
+  <line stroke="#4A90E2" stroke-width="1.8" stroke-linecap="round" x1="12" y1="12" x2="18" y2="8"/>
+  <!-- Data points being discovered - more visible -->
+  <circle fill="#4A90E2" cx="16" cy="7" r="1.5"/>
+  <circle fill="#4A90E2" cx="19" cy="13" r="1" opacity="0.8"/>
+  <circle fill="#4A90E2" cx="8" cy="6" r="1" opacity="0.8"/>
+  <!-- Crosshair marks at cardinal points -->
+  <line stroke="#4A90E2" stroke-width="1.2" x1="12" y1="2" x2="12" y2="4"/>
+  <line stroke="#4A90E2" stroke-width="1.2" x1="12" y1="20" x2="12" y2="22"/>
+  <line stroke="#4A90E2" stroke-width="1.2" x1="2" y1="12" x2="4" y2="12"/>
+  <line stroke="#4A90E2" stroke-width="1.2" x1="20" y1="12" x2="22" y2="12"/>
+</svg>

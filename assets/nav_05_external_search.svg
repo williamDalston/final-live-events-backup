@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Search with external/web indicator - represents GSC data -->
+  <!-- Globe/web structure -->
+  <circle fill="none" stroke="#005EA2" stroke-width="1.5" cx="10" cy="10" r="7"/>
+  <!-- Latitude lines -->
+  <ellipse fill="none" stroke="#005EA2" stroke-width="0.8" cx="10" cy="10" rx="7" ry="3"/>
+  <ellipse fill="none" stroke="#005EA2" stroke-width="0.8" cx="10" cy="10" rx="7" ry="5"/>
+  <!-- Longitude line -->
+  <ellipse fill="none" stroke="#005EA2" stroke-width="0.8" cx="10" cy="10" rx="3" ry="7"/>
+  <!-- Search magnifier handle extending from globe -->
+  <line stroke="#005EA2" stroke-width="2" stroke-linecap="round" x1="15" y1="15" x2="21" y2="21"/>
+  <line stroke="#005EA2" stroke-width="2.5" stroke-linecap="round" x1="16" y1="16" x2="20" y2="20"/>
+  <!-- External link indicator (small arrow) -->
+  <path fill="#005EA2" d="M 18 4 L 18 7 L 15 7 L 15 8 L 19 8 L 19 4 Z"/>
+  <line stroke="#005EA2" stroke-width="1" x1="18" y1="5" x2="15" y2="8"/>
+</svg>

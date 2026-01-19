@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Alert/warning icon for anomaly detection -->
+  <!-- Warning triangle -->
+  <path fill="none" stroke="#E5A000" stroke-width="1.8" stroke-linejoin="round"
+        d="M 12 3 L 22 20 L 2 20 Z"/>
+  <!-- Exclamation mark -->
+  <line stroke="#E5A000" stroke-width="2" stroke-linecap="round" x1="12" y1="9" x2="12" y2="14"/>
+  <circle fill="#E5A000" cx="12" cy="17" r="1"/>
+</svg>

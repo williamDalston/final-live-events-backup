@@ -1,0 +1,242 @@
+/// GA4 pages
+table ga4-pages
+	lineageTag: a185270c-5188-4383-b075-755f60e478f0
+
+	column 'Page location'
+		dataType: string
+		lineageTag: 475c04b5-f639-4fc6-9955-348ece32fc0a
+		summarizeBy: none
+		sourceColumn: Page location
+
+		annotation SummarizationSetBy = Automatic
+
+	column Views
+		dataType: int64
+		formatString: 0
+		lineageTag: 8301d408-812a-4533-b56c-db8ec5f24543
+		summarizeBy: sum
+		sourceColumn: Views
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d6e54ed-3ea8-49e5-8509-2c742ec5cc53
+		summarizeBy: sum
+		sourceColumn: Sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: fe633a08-bb3e-4be0-9ee1-d46b1ee73eca
+		summarizeBy: sum
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Engagement rate'
+		dataType: double
+		lineageTag: bb245d04-c73b-468e-8885-6ee41ea0b655
+		summarizeBy: sum
+		sourceColumn: Engagement rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Average engagement time per session'
+		dataType: double
+		lineageTag: 68925054-0d50-4660-87e9-f39b46780380
+		summarizeBy: sum
+		sourceColumn: Average engagement time per session
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Engaged sessions'
+		dataType: int64
+		formatString: 0
+		lineageTag: d8ff34f6-cf9b-4cd2-895b-bd77812a2108
+		summarizeBy: sum
+		sourceColumn: Engaged sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column1
+		dataType: string
+		lineageTag: a6dd253d-b761-4dfa-9321-06f991659c10
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Page Title (Clean)'
+		dataType: string
+		lineageTag: 65a523d5-8b71-46ea-a430-a73dbeb65dd8
+		summarizeBy: none
+		sourceColumn: Page title.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Page title.2'
+		dataType: string
+		isHidden
+		lineageTag: 66a128ac-752e-447b-b96c-fb8f7ba880cb
+		summarizeBy: none
+		sourceColumn: Page title.2
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE if page is a live event page (URL contains /live/)
+	column 'Is Live Event' = CONTAINSSTRING('ga4-pages'[Page location], "/live/")
+		dataType: boolean
+		lineageTag: f223c752-993b-4fa4-9f91-7db73ad2985f
+
+	/// Extracts live page type from URL (e.g., live-1, live-2, index)
+	column 'Live Page Type' =
+			VAR PageURL = 'ga4-pages'[Page location]
+			VAR IsLive = CONTAINSSTRING(PageURL, "/live/")
+			VAR AfterLive = IF(IsLive, MID(PageURL, SEARCH("/live/", PageURL) + 6, 100), BLANK())
+			VAR SlashPos = SEARCH("/", AfterLive, 1, 0)
+			RETURN IF(SlashPos > 0, LEFT(AfterLive, SlashPos - 1), AfterLive)
+		dataType: string
+		lineageTag: 9f999f36-726c-49d3-ab83-b99b121aa424
+
+	/// TRUE if page is an actual livecast (not landing page, error, or HHS.gov)
+	column 'Is Actual Livecast' =
+			VAR IsLive = 'ga4-pages'[Is Live Event]
+			VAR PageType = 'ga4-pages'[Live Page Type]
+			VAR Title = 'ga4-pages'[Page Title (Clean)]
+			VAR IsLandingPage = PageType = "index.html" || LEFT(PageType, 10) = "index.html"
+			VAR IsErrorPage = Title = "Page Not Found" || Title = "" || Title = "Access denied"
+			VAR IsHHSOnly = Title = "HHS.gov"
+			RETURN IsLive && NOT IsLandingPage && NOT IsErrorPage && NOT IsHHSOnly
+		dataType: boolean
+		lineageTag: 8da6bc8e-e73f-4402-af81-1d4195ebcfe2
+
+	/// URL path extracted from Page location (e.g., /live/index.html)
+	column 'Page path' =
+			VAR FullURL = 'ga4-pages'[Page location]
+			VAR HasProtocol = CONTAINSSTRING(FullURL, "://")
+			VAR AfterProtocol = IF(HasProtocol, MID(FullURL, SEARCH("://", FullURL) + 3, LEN(FullURL)), FullURL)
+			VAR SlashPos = SEARCH("/", AfterProtocol, 1, 0)
+			RETURN IF(SlashPos > 0, MID(AfterProtocol, SlashPos, LEN(AfterProtocol)), "/")
+		dataType: string
+		lineageTag: a323690c-75d3-431d-a850-ec9dbd768296
+
+	partition ga4-pages = m
+		mode: import
+		source =
+				let
+				    // Base load - inline to avoid cyclic reference
+				    FilePath = pDatasetsFolder & "ga4-pages.csv",
+				    RawSource = Csv.Document(File.Contents(FilePath), [Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    SkippedMeta = Table.Skip(RawSource, 6),
+				    Source = Table.PromoteHeaders(SkippedMeta, [PromoteAllScalars=true]),
+				
+				    // Trim key text fields
+				    #"Trimmed Text" =
+				        Table.TransformColumns(
+				            Source,
+				            {
+				                {"Page location", each if _ = null then null else Text.Trim(Text.From(_)), type text},
+				                {"Page title",    each if _ = null then null else Text.Trim(Text.From(_)), type text}
+				            }
+				        ),
+				
+				    // Filter out blank titles/locations
+				    #"Filtered Rows" =
+				        Table.SelectRows(
+				            #"Trimmed Text",
+				            each
+				                [Page title] <> null and [Page title] <> "" and
+				                [Page location] <> null and [Page location] <> ""
+				        ),
+				
+				    // Convert numeric columns safely (handles commas/blanks)
+				    #"Converted Numbers" =
+				        Table.TransformColumns(
+				            #"Filtered Rows",
+				            {
+				                {
+				                    "Views",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Sessions",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Total users",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Engagement rate",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    type number
+				                },
+				                {
+				                    "Average engagement time per session",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    type number
+				                },
+				                {
+				                    "Engaged sessions",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                }
+				            }
+				        ),
+				
+				    // Remove extra trailing column if present
+				    #"Removed Column1" = Table.RemoveColumns(#"Converted Numbers", {"Column1"}, MissingField.Ignore),
+				
+				    // Optional: tidy column order
+				    #"Reordered Columns" =
+				        Table.ReorderColumns(
+				            #"Removed Column1",
+				            {
+				                "Page location",
+				                "Page title",
+				                "Views",
+				                "Sessions",
+				                "Total users",
+				                "Engagement rate",
+				                "Average engagement time per session",
+				                "Engaged sessions"
+				            },
+				            MissingField.Ignore
+				        ),
+				    #"Split Column by Delimiter" = Table.SplitColumn(#"Reordered Columns", "Page title", Splitter.SplitTextByDelimiter("|", QuoteStyle.Csv), {"Page title.1", "Page title.2"})
+				in
+				    #"Split Column by Delimiter"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Hover state: Active collapse -->
+  <!-- Right boundary line (expanded nav rail) -->
+  <line stroke="#4A90E2" stroke-width="1.8" x1="18" y1="4" x2="18" y2="20"/>
+  <!-- Double chevron pointing left (collapse) - brighter -->
+  <path fill="none" stroke="#4A90E2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        d="M 14 8 L 10 12 L 14 16"/>
+  <path fill="none" stroke="#4A90E2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        d="M 10 8 L 6 12 L 10 16"/>
+  <!-- Motion lines (showing collapse) -->
+  <line stroke="#4A90E2" stroke-width="1" stroke-opacity="0.3" x1="16" y1="10" x2="12" y2="10"/>
+  <line stroke="#4A90E2" stroke-width="1" stroke-opacity="0.3" x1="16" y1="14" x2="12" y2="14"/>
+</svg>

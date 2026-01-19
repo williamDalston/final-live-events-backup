@@ -1,0 +1,53 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+/// Errors in queries that were loaded on 1/15/2026 3:54:12 PM.
+queryGroup 'Query Errors - 1/15/2026 3:54:12 PM'
+
+	annotation PBI_QueryGroupOrder = 0
+
+/// Errors in queries that were loaded on 1/15/2026 8:29:34 PM.
+queryGroup 'Query Errors - 1/15/2026 8:29:34 PM'
+
+	annotation PBI_QueryGroupOrder = 1
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["ga4-events","ga4-geography-livecast-play","ga4-tech","ga4-traffic-source","ga4-devices","ga4-geography","ga4-pages","ga4-titles","ga4-traffic-source-livecast-play","gsc-queries","gsc-countries","gsc-search-appearance","gsc-pages","gsc-devices","gsc-chart","ga4-daily orig","pDatasetsFolder","fxTransformCTR","Daily Traffic","Events","Daily Pages","ga4-daily-device","ga4-daily-country","ga4-daily","ga4-daily-source","ga4-daily2"]
+
+annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
+
+ref table DimLivecast
+ref table DimAction
+ref table Measures_Livecast
+ref table gsc-queries
+ref table gsc-countries
+ref table gsc-search-appearance
+ref table gsc-pages
+ref table gsc-devices
+ref table gsc-chart
+ref table DimDate
+ref table 'Recommended Actions'
+ref table 'Action Catalog'
+ref table ga4-events
+ref table ga4-titles
+ref table ga4-daily
+ref table ga4-daily2
+ref table ga4-geography-livecast-play
+ref table ga4-traffic-source
+ref table ga4-devices
+ref table ga4-geography
+ref table ga4-traffic-source-livecast-play
+ref table ga4-daily-device
+ref table DimDevice
+ref table ga4-pages
+ref table DimGeography
+ref table DimSource
+
+ref cultureInfo en-US
+

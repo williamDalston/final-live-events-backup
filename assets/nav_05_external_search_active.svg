@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Active state: Currently on External Search page -->
+  <!-- Globe - filled -->
+  <circle fill="#4A90E2" fill-opacity="0.1" stroke="#4A90E2" stroke-width="1.8" cx="10" cy="10" r="7"/>
+  <!-- Latitude/longitude lines -->
+  <ellipse fill="none" stroke="#4A90E2" stroke-width="1" cx="10" cy="10" rx="7" ry="3"/>
+  <ellipse fill="none" stroke="#4A90E2" stroke-width="1" cx="10" cy="10" rx="7" ry="5"/>
+  <ellipse fill="none" stroke="#4A90E2" stroke-width="1" cx="10" cy="10" rx="3" ry="7"/>
+  <!-- Magnifier handle - thicker -->
+  <line stroke="#4A90E2" stroke-width="2.5" stroke-linecap="round" x1="15" y1="15" x2="21" y2="21"/>
+  <line stroke="#4A90E2" stroke-width="3" stroke-linecap="round" x1="16" y1="16" x2="20" y2="20"/>
+  <!-- External link indicator -->
+  <path fill="#4A90E2" d="M 18 4 L 18 7 L 15 7 L 15 8 L 19 8 L 19 4 Z"/>
+  <line stroke="#4A90E2" stroke-width="1.2" x1="18" y1="5" x2="15" y2="8"/>
+  <!-- Active indicator -->
+  <rect fill="#4A90E2" x="0" y="0" width="3" height="24"/>
+</svg>

@@ -1,0 +1,99 @@
+table 'Action Catalog'
+	lineageTag: 7d5c3f66-8abe-4dc7-af43-b963a5101951
+
+	/// Executive popup info
+	measure Info_Popup_Executive:Info_Popup_Executive =
+			"
+			<style>
+			  .popup { font-family: Segoe UI; padding: 16px; background: #fff; border: 1px solid #DFE1E2; border-radius: 4px; }
+			  .title { font-size: 16px; font-weight: 600; color: #1B1B1B; margin-bottom: 12px; }
+			  .section { font-size: 11px; font-weight: 600; color: #005EA2; margin: 12px 0 4px 0; }
+			  .text { font-size: 10px; color: #565C65; line-height: 1.4; }
+			</style>
+			<div class='popup'>
+			  <div class='title'>Executive Summary Overview</div>
+			  <div class='section'>PURPOSE</div>
+			  <div class='text'>Get a high-level snapshot of live events performance.</div>
+			  <div class='section'>KEY METRICS</div>
+			  <div class='text'>• Sessions: Visits to live event pages<br>• Page Views: Total pages viewed<br>• Device Breakdown: Mobile, Desktop, Tablet</div>
+			  <div class='section'>HOW TO USE</div>
+			  <div class='text'>• Review KPIs for trends<br>• Check geographic distribution<br>• Analyze device breakdown</div>
+			</div>
+			"
+		displayFolder: 99 - Utility
+		lineageTag: e15883e8-5ac1-4391-bb79-bfabc58fc71b
+
+	/// Data refresh time
+	measure 'Last Refresh' = "Last refresh: " & FORMAT(NOW(), "MMM D, YYYY")
+		displayFolder: 99 - Utility
+		lineageTag: dbc1debe-2fa7-4e29-ba28-c92695f78935
+
+	column Sort
+		formatString: 0
+		lineageTag: 3eadba0a-8794-4733-97e6-c02940f3b48f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActionKey
+		lineageTag: 4f1cd79d-4493-47a3-ba5e-56d14af675d3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ActionKey]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DefaultPriority
+		lineageTag: 53b2ed54-135b-4bae-9431-490a3197472d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DefaultPriority]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Icon
+		lineageTag: 671626cf-9118-4710-9130-769bcd3854e7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Icon]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Title
+		lineageTag: 74ac1463-931e-48a2-ad46-fa912622440b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Title]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prompt
+		lineageTag: 8f6c530f-3e6d-486a-8941-210d33c1f870
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Prompt]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Action Catalog' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Sort", INTEGER,
+				    "ActionKey", STRING,
+				    "DefaultPriority", STRING,
+				    "Icon", STRING,
+				    "Title", STRING,
+				    "Prompt", STRING,
+				    {
+				        {1, "MOM_DROP",   "HIGH",   "📉", "Investigate Drop in Viewership", "Check traffic sources and email campaign performance."},
+				        {2, "MOBILE",     "MEDIUM", "📱", "Optimize for Mobile Viewers",    "Validate player controls and layout on small screens."},
+				        {3, "GEO",        "INFO",   "🌍", "Regional Interest Detected",     "Consider targeting specific content for this region."},
+				        {4, "PLAYRATE",   "MEDIUM", "▶️", "Improve Play Rate",              "Ensure video player is above the fold and auto-play is configured correctly."}
+				    }
+				)
+
+	annotation PBI_Id = c9a22a7a3a504f19839bde7badc92403
+

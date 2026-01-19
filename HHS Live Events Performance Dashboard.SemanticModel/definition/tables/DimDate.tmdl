@@ -1,0 +1,108 @@
+/// Date dimension
+table DimDate
+	lineageTag: 0ef4c180-4162-4be6-b6bb-8a2f144b8723
+	dataCategory: Time
+
+	column Date
+		lineageTag: 71665790-b53a-4cae-b7cc-86bb16985d9c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		lineageTag: fdcd2fab-8360-42e0-986f-a274d688a409
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		lineageTag: 79ebc465-894d-4a33-9616-95a734076e32
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		lineageTag: 0bfc5a41-e7f3-46be-bf24-a8c1630c72e3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week'
+		lineageTag: 2e7c8427-b6aa-4d3a-995d-37336d140ef2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day of Week]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekday'
+		lineageTag: 0022cf59-3c2c-483c-9f22-854fe96b3622
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Is Weekday]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter = "Q" & FORMAT([Date], "Q") & " " & YEAR([Date])
+		dataType: string
+		lineageTag: 90976e08-0336-4b32-af0e-7ffb9a8479bb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Week Number' = WEEKNUM([Date], 2)
+		dataType: int64
+		lineageTag: 0e0b76db-280a-4101-9e7c-f8293cc52f6c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Year > Quarter > Month > Week > Date drill-down hierarchy
+	hierarchy 'Date Hierarchy'
+		lineageTag: 0dd51a9b-fe6b-4ce7-b736-c1242139358c
+
+		level Year
+			lineageTag: 4c4467d9-fb33-46c4-a70a-04b88ab635fb
+			column: Year
+
+		level Quarter
+			lineageTag: fadf2077-9b21-4b1b-b0dd-d622ea8e19c0
+			column: Quarter
+
+		level Month
+			lineageTag: c468991d-f59a-437d-ba10-7bc588e99f89
+			column: Month
+
+		level Week
+			lineageTag: 4fac3ca2-f512-46a2-9ca3-37d766442e37
+			column: 'Week Number'
+
+		level Date
+			lineageTag: 620a3bdd-1981-4325-84db-0969a18998aa
+			column: Date
+
+	partition DimDate = calculated
+		mode: import
+		source =
+				VAR MinDataDate = MIN('gsc-chart'[Date])
+				VAR MaxDataDate = MAX('gsc-chart'[Date])
+				VAR StartDate = IF(ISBLANK(MinDataDate), DATE(2024, 1, 1), MinDataDate)
+				VAR EndDate = IF(ISBLANK(MaxDataDate), DATE(2025, 12, 31), MaxDataDate)
+				RETURN
+				ADDCOLUMNS(
+				    CALENDAR(StartDate, EndDate),
+				    "Year", YEAR([Date]),
+				    "Month Number", MONTH([Date]),
+				    "Month", FORMAT([Date], "mmm yyyy"),
+				    "Day of Week", FORMAT([Date], "dddd"),
+				    "Is Weekday", IF(WEEKDAY([Date], 2) <= 5, TRUE(), FALSE())
+				)
+

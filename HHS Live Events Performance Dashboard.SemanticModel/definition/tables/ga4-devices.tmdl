@@ -1,0 +1,146 @@
+/// GA4 devices
+table ga4-devices
+	lineageTag: 9c979e4e-0c41-4d51-888c-6e55a3e00479
+
+	column 'Device category'
+		dataType: string
+		lineageTag: 9df43389-4d20-4cf0-a7e4-62832cb8aa28
+		summarizeBy: none
+		sourceColumn: Device category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: 3f0232a2-2e1a-4725-adae-dcdeafa406a8
+		summarizeBy: sum
+		sourceColumn: Sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column Views
+		dataType: int64
+		formatString: 0
+		lineageTag: 8497457f-4218-4e32-8471-6fad40c632fe
+		summarizeBy: sum
+		sourceColumn: Views
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: cdcc6171-1d1c-43b3-af9b-f074fc54ae89
+		summarizeBy: sum
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Engagement rate'
+		dataType: double
+		lineageTag: a4d7f3a7-9411-4aff-adad-078c50775bc5
+		summarizeBy: sum
+		sourceColumn: Engagement rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column1
+		dataType: string
+		lineageTag: fdb2aca8-5e37-4868-a246-8fae46ea149e
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ga4-devices = m
+		mode: import
+		source =
+				let
+				    // Base load - inline to avoid cyclic reference
+				    FilePath = pDatasetsFolder & "ga4-devices.csv",
+				    RawSource = Csv.Document(File.Contents(FilePath), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    SkippedMeta = Table.Skip(RawSource, 6),
+				    Source = Table.PromoteHeaders(SkippedMeta, [PromoteAllScalars=true]),
+				
+				    // Clean Device category
+				    #"Trimmed Device Category" =
+				        Table.TransformColumns(
+				            Source,
+				            {{"Device category", each if _ = null then null else Text.Trim(Text.From(_)), type text}}
+				        ),
+				
+				    // Filter out empty device category rows
+				    #"Filtered Device Category" =
+				        Table.SelectRows(
+				            #"Trimmed Device Category",
+				            each [Device category] <> null and [Device category] <> ""
+				        ),
+				
+				    // Convert numeric columns safely (handles commas/blanks)
+				    #"Converted Numbers" =
+				        Table.TransformColumns(
+				            #"Filtered Device Category",
+				            {
+				                {
+				                    "Sessions",
+				                    (x) =>
+				                        let
+				                            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in
+				                            n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Views",
+				                    (x) =>
+				                        let
+				                            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in
+				                            n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Total users",
+				                    (x) =>
+				                        let
+				                            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in
+				                            n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Engagement rate",
+				                    (x) =>
+				                        let
+				                            t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in
+				                            n,
+				                    type number
+				                }
+				            }
+				        ),
+				
+				    // Remove extra trailing column if present
+				    #"Removed Column1" = Table.RemoveColumns(#"Converted Numbers", {"Column1"}, MissingField.Ignore),
+				
+				    // Optional: tidy column order
+				    #"Reordered Columns" =
+				        Table.ReorderColumns(
+				            #"Removed Column1",
+				            {"Device category", "Sessions", "Views", "Total users", "Engagement rate"},
+				            MissingField.Ignore
+				        )
+				in
+				    #"Reordered Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

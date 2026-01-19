@@ -1,0 +1,101 @@
+/// Action dimension
+table DimAction
+	lineageTag: f8d63870-4c4c-442c-ba5d-f2465030d32a
+
+	/// Recommended actions
+	measure 'Recommended Actions HTML' = ```
+			
+			VAR Header =
+			"<div style='font-family:Segoe UI;'>
+			  <div style='font-size:14px; font-weight:600; color:#1B1B1B; margin-bottom:10px;'>
+			    Recommended Actions
+			  </div>"
+			
+			VAR Cards =
+			CONCATENATEX(
+			    'Recommended Actions',
+			    VAR p = 'Recommended Actions'[Priority]
+			    VAR icon = 'Recommended Actions'[Icon]
+			    VAR title = 'Recommended Actions'[Title]
+			    VAR why = 'Recommended Actions'[Why]
+			    VAR impact = 'Recommended Actions'[Impact]
+			
+			    VAR Border =
+			        SWITCH(
+			            p,
+			            "HIGH", "#D83933",
+			            "MEDIUM", "#FFBE2E",
+			            "INFO", "#005EA2",
+			            "#71767A"
+			        )
+			    VAR Bg =
+			        SWITCH(
+			            p,
+			            "HIGH", "#FFF1F0",
+			            "MEDIUM", "#FFF8E6",
+			            "INFO", "#E7F2F8",
+			            "#F0F0F0"
+			        )
+			    VAR Label =
+			        SWITCH(p, "HIGH", "HIGH", "MEDIUM", "MEDIUM", "INFO", "INFO", p)
+			
+			    RETURN
+			    "<div style='background:" & Bg & ";
+			                border-left:4px solid " & Border & ";
+			                padding:12px;
+			                margin-bottom:8px;
+			                border-radius:6px;'>
+			        <div style='font-size:11px; font-weight:700; color:" & Border & "; letter-spacing:0.4px; margin-bottom:6px;'>
+			            " & icon & " " & Label & "
+			        </div>
+			        <div style='font-size:12px; font-weight:600; color:#1B1B1B; margin-bottom:6px;'>
+			            " & title & "
+			        </div>
+			        <div style='font-size:11px; color:#565C65; margin-bottom:6px; line-height:1.25;'>
+			            <span style='font-weight:600; color:#3D4551;'>Why:</span> " & why & "
+			        </div>
+			        <div style='font-size:11px; color:#565C65; line-height:1.25;'>
+			            <span style='font-weight:600; color:#3D4551;'>Impact:</span> " & impact & "
+			        </div>
+			    </div>",
+			    UNICHAR(10),
+			    'Recommended Actions'[Sort],
+			    ASC
+			)
+			
+			VAR Footer = "</div>"
+			
+			RETURN
+			Header & Cards & Footer
+			
+			```
+		displayFolder: 10 - AI Insights
+		lineageTag: fe38cb35-447d-4a38-9c14-83a658a84f35
+
+	column Action
+		lineageTag: 2aa1ebbd-51cd-4c65-889d-3aa9fb4181f5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Action]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Key column
+	column livecast_action
+		isHidden
+		lineageTag: 4c7a71fc-ad5d-4749-9fa3-61616caa7d4f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [livecast_action]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimAction = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS(
+				    VALUES('ga4-events'[Event name]),
+				    "livecast_action", 'ga4-events'[Event name],
+				    "Action", 'ga4-events'[Event name]
+				)
+

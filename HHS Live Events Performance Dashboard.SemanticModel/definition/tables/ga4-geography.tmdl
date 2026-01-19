@@ -1,0 +1,154 @@
+/// GA4 geography
+table ga4-geography
+	lineageTag: 53b73208-5ba8-44c7-97ab-7c4058caf4c4
+
+	column Country
+		dataType: string
+		lineageTag: 59b613a7-4b60-4b76-b3af-89241cb290cd
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 11aa15ab-afd9-405d-8c34-0acbb1371d36
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: f719fb89-4a77-4ea3-8561-598635f247f9
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: 3c0da817-99ee-431f-af03-f7a40c68faf5
+		summarizeBy: sum
+		sourceColumn: Sessions
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total users'
+		dataType: int64
+		formatString: 0
+		lineageTag: 27aa5c40-0f86-4eb8-98a3-8f2d544d730c
+		summarizeBy: sum
+		sourceColumn: Total users
+
+		annotation SummarizationSetBy = Automatic
+
+	column Views
+		dataType: int64
+		formatString: 0
+		lineageTag: d6dd2674-6842-4530-8396-dbedb6f0e6e0
+		summarizeBy: sum
+		sourceColumn: Views
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column1
+		dataType: string
+		lineageTag: 4afad7cd-578e-4035-b7c7-b77d91cb039a
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Composite key for geography dimension
+	column GeoKey = 'ga4-geography'[City] & "|" & 'ga4-geography'[Country] & "|" & 'ga4-geography'[Region]
+		dataType: string
+		isHidden
+		lineageTag: dc2a0139-0483-42e0-b03b-f33c478d7b9b
+
+	/// Disambiguated location label for Azure Maps (prevents Paris, TX vs Paris, France)
+	column GeoLabel = [City] & ", " & [Region] & ", " & [Country]
+		dataType: string
+		lineageTag: 8c0e329f-70c3-4633-973e-b1fdd1e72c0e
+
+	partition ga4-geography = m
+		mode: import
+		source =
+				let
+				    // Base load - inline instead of using shared function to avoid cyclic reference
+				    FilePath = pDatasetsFolder & "ga4-geography.csv",
+				    RawSource = Csv.Document(File.Contents(FilePath), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    SkippedMeta = Table.Skip(RawSource, 6),
+				    Source = Table.PromoteHeaders(SkippedMeta, [PromoteAllScalars=true]),
+				
+				    // Trim text fields
+				    #"Trimmed Text" =
+				        Table.TransformColumns(
+				            Source,
+				            {
+				                {"Country", each if _ = null then null else Text.Trim(Text.From(_)), type text},
+				                {"Region",  each if _ = null then null else Text.Trim(Text.From(_)), type text},
+				                {"City",    each if _ = null then null else Text.Trim(Text.From(_)), type text}
+				            }
+				        ),
+				
+				    // Filter out junk rows
+				    #"Filtered Rows" =
+				        Table.SelectRows(
+				            #"Trimmed Text",
+				            each
+				                [Country] <> null and [Country] <> "" and [Country] <> "(not set)" and
+				                [Region]  <> null and [Region]  <> "" and [Region]  <> "(not set)" and
+				                [City]    <> null and [City]    <> "" and [City]    <> "(not set)"
+				        ),
+				
+				    // Convert numeric columns safely (handles commas/blanks)
+				    #"Converted Numbers" =
+				        Table.TransformColumns(
+				            #"Filtered Rows",
+				            {
+				                {
+				                    "Sessions",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Total users",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                },
+				                {
+				                    "Views",
+				                    (x) =>
+				                        let t = if x = null then null else Text.Replace(Text.From(x), ",", ""),
+				                            n = try Number.FromText(t) otherwise null
+				                        in n,
+				                    Int64.Type
+				                }
+				            }
+				        ),
+				
+				    // Remove extra trailing column if present
+				    #"Removed Column1" = Table.RemoveColumns(#"Converted Numbers", {"Column1"}, MissingField.Ignore),
+				
+				    // Optional: tidy column order
+				    #"Reordered Columns" =
+				        Table.ReorderColumns(
+				            #"Removed Column1",
+				            {"Country", "Region", "City", "Sessions", "Total users", "Views"},
+				            MissingField.Ignore
+				        )
+				in
+				    #"Reordered Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

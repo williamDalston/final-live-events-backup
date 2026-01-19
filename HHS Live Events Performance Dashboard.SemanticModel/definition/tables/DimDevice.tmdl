@@ -1,0 +1,13 @@
+/// Device dimension - stable reference for slicers
+table DimDevice
+	lineageTag: 11933fc9-6247-4e72-a7a9-8520c4db22d3
+
+	column deviceCategory
+		lineageTag: 94bac11e-d444-4086-8acb-517afeaded65
+		isNameInferred
+		sourceColumn: ga4-daily-device[deviceCategory]
+
+	partition DimDevice = calculated
+		mode: import
+		source = DISTINCT('ga4-daily-device'[deviceCategory])
+
