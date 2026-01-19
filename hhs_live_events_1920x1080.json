@@ -1,0 +1,565 @@
+{
+  "$schema": "../schema.visual_blueprint.v2.json",
+  "name": "HHS Live Events Performance Dashboard",
+  "version": "2.0",
+  "description": "7-page Live Events Dashboard with Actions Panel - 1920x1080 canvas, USWDS 3.0 compliant",
+
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+
+  "theme": {
+    "file": "../../05_Themes/HHS_USWDS_Theme.json",
+    "colors": {
+      "primary": "#005EA2",
+      "primaryVivid": "#0076D6",
+      "primaryDark": "#1A4480",
+      "primaryDarker": "#162E51",
+      "background": "#F0F0F0",
+      "white": "#FFFFFF",
+      "text": "#1B1B1B",
+      "textSecondary": "#565C65",
+      "textTertiary": "#71767A",
+      "border": "#DFE1E2",
+      "innerPlaceholder": "#F8F9FA",
+      "hoverFill": "#E7F2F4",
+      "hoverBorder": "#0D5C6D",
+      "success": "#00A91C",
+      "error": "#D83933",
+      "warning": "#FFBE2E",
+      "highPriority": "#D83B01",
+      "mediumPriority": "#E5A000",
+      "infoPriority": "#0076D6"
+    }
+  },
+
+  "defaults": {
+    "safeMargin": 84,
+    "navRailWidth": 60,
+    "gridAlignment": 12,
+    "cardWidth": 295,
+    "cardHeight": 100,
+    "borderRadius": 4,
+    "borderColor": "#DFE1E2",
+    "fontFamily": "Segoe UI"
+  },
+
+  "layout": {
+    "nav": {"x": 0, "y": 0, "w": 60, "h": 1080, "background": "#FFFFFF"},
+    "header": {"x": 60, "y": 0, "w": 1860, "h": 96},
+    "content": {"x": 84, "y": 124, "w": 1346, "h": 932},
+    "actionsPanel": {"x": 1448, "y": 201, "w": 400, "h": 412, "background": "#FFFFFF"}
+  },
+
+  "semanticModel": {
+    "name": "HHS Live Events Performance Dashboard",
+    "tables": {
+      "fact": ["ga4-daily", "ga4-daily2", "ga4-events", "ga4-pages"],
+      "dimension": ["DimDate", "DimLivecast", "DimDevice", "DimGeography", "DimSource", "DimAction"],
+      "measures": "Measures_Livecast"
+    }
+  },
+
+  "globalElements": {
+    "navRailBackground": {
+      "id": "nav_rail_bg",
+      "visualType": "shape",
+      "x": 0, "y": 0, "w": 60, "h": 1080,
+      "formatting": {"background": "#FFFFFF", "border": false}
+    },
+    "navRailDivider": {
+      "id": "nav_rail_divider",
+      "visualType": "shape",
+      "x": 60, "y": 0, "w": 1, "h": 1080,
+      "formatting": {"background": "#DFE1E2"}
+    },
+    "headerDivider": {
+      "id": "header_divider",
+      "visualType": "shape",
+      "x": 84, "y": 96, "w": 1764, "h": 1,
+      "formatting": {"background": "#DFE1E2"}
+    },
+    "dateSlicer": {
+      "id": "date_slicer",
+      "visualType": "slicer",
+      "title": "Date Range",
+      "x": 84, "y": 26, "w": 200, "h": 50,
+      "fields": {"values": ["DimDate[Date]"]},
+      "formatting": {"slicerType": "Between", "background": "transparent"}
+    },
+    "resetButton": {
+      "id": "reset_button",
+      "visualType": "actionButton",
+      "title": "Reset",
+      "x": 1401, "y": 26, "w": 50, "h": 50,
+      "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}
+    },
+    "infoButton": {
+      "id": "info_button",
+      "visualType": "actionButton",
+      "title": "i",
+      "x": 1461, "y": 26, "w": 50, "h": 50,
+      "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#005EA2", "borderRadius": 4}
+    }
+  },
+
+  "actionsPanel": {
+    "container": {
+      "id": "actions_panel_container",
+      "visualType": "shape",
+      "x": 1448, "y": 201, "w": 400, "h": 412,
+      "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}
+    },
+    "accentBar": {
+      "id": "actions_accent_bar",
+      "visualType": "shape",
+      "x": 1448, "y": 201, "w": 4, "h": 412,
+      "formatting": {"background": "#005EA2", "border": false}
+    },
+    "title": {
+      "id": "actions_title",
+      "visualType": "textbox",
+      "title": "Recommended Actions",
+      "x": 1467, "y": 216, "w": 372, "h": 28,
+      "formatting": {"fontSize": 13, "fontWeight": "semibold", "color": "#1B1B1B"}
+    },
+    "cards": [
+      {
+        "id": "action_card_1",
+        "visualType": "shape",
+        "x": 1470, "y": 258, "w": 352, "h": 90,
+        "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4},
+        "priority": "HIGH",
+        "priorityColor": "#D83B01"
+      },
+      {
+        "id": "action_card_2",
+        "visualType": "shape",
+        "x": 1470, "y": 365, "w": 352, "h": 90,
+        "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4},
+        "priority": "MEDIUM",
+        "priorityColor": "#E5A000"
+      },
+      {
+        "id": "action_card_3",
+        "visualType": "shape",
+        "x": 1470, "y": 471, "w": 352, "h": 90,
+        "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4},
+        "priority": "INFO",
+        "priorityColor": "#0076D6"
+      }
+    ],
+    "disclaimer": {
+      "id": "actions_disclaimer",
+      "visualType": "textbox",
+      "title": "AI-generated insights based on data patterns",
+      "x": 1467, "y": 576, "w": 361, "h": 28,
+      "formatting": {"fontSize": 9, "color": "#71767A"}
+    },
+    "expandButton": {
+      "id": "expand_button",
+      "visualType": "actionButton",
+      "title": "Actions ❯",
+      "x": 1485, "y": 123, "w": 159, "h": 60,
+      "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4},
+      "bookmark": "Actions_Expanded"
+    },
+    "collapseButton": {
+      "id": "collapse_button",
+      "visualType": "actionButton",
+      "title": "❮ Collapse",
+      "x": 1653, "y": 123, "w": 159, "h": 60,
+      "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4},
+      "bookmark": "Actions_Collapsed"
+    }
+  },
+
+  "kpiRowTemplate": {
+    "y": 124,
+    "height": 100,
+    "gap": 12,
+    "positions": [
+      {"x": 84, "w": 295},
+      {"x": 391, "w": 295},
+      {"x": 698, "w": 295},
+      {"x": 1005, "w": 295}
+    ],
+    "formatting": {
+      "background": "#FFFFFF",
+      "border": true,
+      "borderColor": "#DFE1E2",
+      "borderRadius": 4,
+      "shadow": false
+    }
+  },
+
+  "pages": [
+    {
+      "name": "CommandCenter",
+      "displayName": "Command Center",
+      "layoutMode": "federal",
+      "activeIndicatorY": 84,
+      "background": {"color": "#F0F0F0"},
+      "sections": [
+        {
+          "type": "navigation",
+          "items": [
+            {"id": "active_indicator_p1", "visualType": "shape", "x": 0, "y": 84, "w": 4, "h": 60, "formatting": {"background": "#005EA2", "border": false}}
+          ]
+        },
+        {
+          "type": "header",
+          "items": [
+            {"id": "eyebrow_p1", "visualType": "textbox", "title": "HHS LIVE EVENTS", "x": 84, "y": 20, "w": 200, "h": 20, "formatting": {"fontSize": 11, "color": "#565C65"}},
+            {"id": "page_title_p1", "visualType": "textbox", "title": "Executive Summary", "x": 84, "y": 44, "w": 400, "h": 36, "formatting": {"fontSize": 24, "fontWeight": "semibold", "color": "#1B1B1B"}}
+          ]
+        },
+        {
+          "type": "kpi_row",
+          "y": 124,
+          "items": [
+            {"id": "kpi_sessions", "visualType": "card", "x": 84, "y": 124, "w": 295, "h": 100, "title": "Total Sessions", "fields": {"values": ["[Total Sessions]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_users", "visualType": "card", "x": 391, "y": 124, "w": 295, "h": 100, "title": "Total Users", "fields": {"values": ["[Total Users]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_duration", "visualType": "card", "x": 698, "y": 124, "w": 295, "h": 100, "title": "Avg Session Duration", "fields": {"values": ["[Avg Session Duration]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_play_events", "visualType": "card", "x": 1005, "y": 124, "w": 295, "h": 100, "title": "Total Play Events", "fields": {"values": ["[Total Play Events]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_1", "visualType": "textbox", "title": "Geographic & Device Distribution", "x": 84, "y": 240, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_top_left", "visualType": "shape", "x": 84, "y": 264, "w": 667, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_geography", "visualType": "barChart", "title": "Sessions by City", "x": 102, "y": 336, "w": 631, "h": 281, "fields": {"yAxis": ["ga4-geography[City]"], "xAxis": ["[Sessions_City]"]}, "formatting": {"background": "transparent"}},
+            {"id": "container_top_right", "visualType": "shape", "x": 763, "y": 264, "w": 667, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_devices", "visualType": "donutChart", "title": "Device Distribution", "x": 781, "y": 336, "w": 631, "h": 281, "fields": {"legend": ["ga4-devices[Device category]"], "values": ["[Sessions_Device]"]}, "formatting": {"background": "transparent"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_2", "visualType": "textbox", "title": "Content Performance", "x": 84, "y": 660, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_bottom_left", "visualType": "shape", "x": 84, "y": 684, "w": 667, "h": 330, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_trend", "visualType": "lineChart", "title": "Sessions Over Time", "x": 102, "y": 756, "w": 631, "h": 230, "fields": {"xAxis": ["DimDate[Date]"], "yAxis": ["[Total Sessions]"]}, "formatting": {"background": "transparent"}},
+            {"id": "container_bottom_right", "visualType": "shape", "x": 763, "y": 684, "w": 667, "h": 330, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_top_content", "visualType": "barChart", "title": "Top Content", "x": 781, "y": 756, "w": 631, "h": 230, "fields": {"yAxis": ["DimLivecast[Livecast Title]"], "xAxis": ["[Total Sessions]"]}, "formatting": {"background": "transparent"}}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Explorer",
+      "displayName": "Content Explorer",
+      "layoutMode": "federal",
+      "activeIndicatorY": 164,
+      "background": {"color": "#F0F0F0"},
+      "sections": [
+        {
+          "type": "navigation",
+          "items": [
+            {"id": "active_indicator_p2", "visualType": "shape", "x": 0, "y": 164, "w": 4, "h": 60, "formatting": {"background": "#005EA2", "border": false}}
+          ]
+        },
+        {
+          "type": "header",
+          "items": [
+            {"id": "eyebrow_p2", "visualType": "textbox", "title": "HHS LIVE EVENTS", "x": 84, "y": 20, "w": 200, "h": 20, "formatting": {"fontSize": 11, "color": "#565C65"}},
+            {"id": "page_title_p2", "visualType": "textbox", "title": "Content Explorer", "x": 84, "y": 44, "w": 400, "h": 36, "formatting": {"fontSize": 24, "fontWeight": "semibold", "color": "#1B1B1B"}}
+          ]
+        },
+        {
+          "type": "slicer_panel",
+          "items": [
+            {"id": "slicer_livecast", "visualType": "slicer", "title": "Select Livecast", "x": 84, "y": 124, "w": 300, "h": 50, "fields": {"values": ["DimLivecast[Livecast Title]"]}, "formatting": {"slicerType": "dropdown"}}
+          ]
+        },
+        {
+          "type": "kpi_row",
+          "y": 190,
+          "items": [
+            {"id": "kpi_page_views", "visualType": "card", "x": 84, "y": 190, "w": 295, "h": 100, "title": "Page Views", "fields": {"values": ["[Total Page Views]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_unique_viewers", "visualType": "card", "x": 391, "y": 190, "w": 295, "h": 100, "title": "Unique Viewers", "fields": {"values": ["[Unique Viewers]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_engagement", "visualType": "card", "x": 698, "y": 190, "w": 295, "h": 100, "title": "Avg Engagement", "fields": {"values": ["[Avg Engagement Time]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_bounce", "visualType": "card", "x": 1005, "y": 190, "w": 295, "h": 100, "title": "Bounce Rate", "fields": {"values": ["[Bounce Rate]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "container_explorer_main", "visualType": "shape", "x": 84, "y": 310, "w": 1346, "h": 450, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "table_content", "visualType": "table", "title": "Content Performance Detail", "x": 102, "y": 382, "w": 1310, "h": 350, "fields": {"columns": ["DimLivecast[Livecast Title]", "ga4-pages[Page path]", "[Total Sessions]", "[Total Page Views]", "[Avg Engagement Time]", "[Bounce Rate]"]}, "formatting": {"background": "transparent"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "container_explorer_trend", "visualType": "shape", "x": 84, "y": 780, "w": 1346, "h": 234, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_explorer_trend", "visualType": "lineChart", "title": "Page Views Over Time", "x": 102, "y": 852, "w": 1310, "h": 134, "fields": {"xAxis": ["DimDate[Date]"], "yAxis": ["[Total Page Views]"]}, "formatting": {"background": "transparent"}}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TrafficAcquisition",
+      "displayName": "Traffic & Acquisition",
+      "layoutMode": "federal",
+      "activeIndicatorY": 244,
+      "background": {"color": "#F0F0F0"},
+      "sections": [
+        {
+          "type": "navigation",
+          "items": [
+            {"id": "active_indicator_p3", "visualType": "shape", "x": 0, "y": 244, "w": 4, "h": 60, "formatting": {"background": "#005EA2", "border": false}}
+          ]
+        },
+        {
+          "type": "header",
+          "items": [
+            {"id": "eyebrow_p3", "visualType": "textbox", "title": "HHS LIVE EVENTS", "x": 84, "y": 20, "w": 200, "h": 20, "formatting": {"fontSize": 11, "color": "#565C65"}},
+            {"id": "page_title_p3", "visualType": "textbox", "title": "Traffic & Acquisition", "x": 84, "y": 44, "w": 400, "h": 36, "formatting": {"fontSize": 24, "fontWeight": "semibold", "color": "#1B1B1B"}}
+          ]
+        },
+        {
+          "type": "kpi_row",
+          "y": 124,
+          "items": [
+            {"id": "kpi_organic", "visualType": "card", "x": 84, "y": 124, "w": 295, "h": 100, "title": "Organic Sessions", "fields": {"values": ["[Organic Sessions]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_direct", "visualType": "card", "x": 391, "y": 124, "w": 295, "h": 100, "title": "Direct Sessions", "fields": {"values": ["[Direct Sessions]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_referral", "visualType": "card", "x": 698, "y": 124, "w": 295, "h": 100, "title": "Referral Sessions", "fields": {"values": ["[Referral Sessions]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_social", "visualType": "card", "x": 1005, "y": 124, "w": 295, "h": 100, "title": "Social Sessions", "fields": {"values": ["[Social Sessions]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_traffic", "visualType": "textbox", "title": "Traffic Sources", "x": 84, "y": 240, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_traffic_left", "visualType": "shape", "x": 84, "y": 264, "w": 440, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_source_medium", "visualType": "barChart", "title": "Sessions by Source/Medium", "x": 102, "y": 336, "w": 404, "h": 281, "fields": {"yAxis": ["ga4-traffic-source[Session source / medium]"], "xAxis": ["[Sessions_Source]"]}, "formatting": {"background": "transparent"}},
+            {"id": "container_traffic_center", "visualType": "shape", "x": 536, "y": 264, "w": 440, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_channel", "visualType": "donutChart", "title": "Channel Grouping", "x": 554, "y": 336, "w": 404, "h": 281, "fields": {"legend": ["ga4-traffic-source[Session default channel group]"], "values": ["[Sessions_Source]"]}, "formatting": {"background": "transparent"}},
+            {"id": "container_traffic_right", "visualType": "shape", "x": 988, "y": 264, "w": 442, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_campaign", "visualType": "barChart", "title": "Top Campaigns", "x": 1006, "y": 336, "w": 406, "h": 281, "fields": {"yAxis": ["ga4-traffic-source[Session campaign]"], "xAxis": ["[Sessions_Source]"]}, "formatting": {"background": "transparent"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_acquisition", "visualType": "textbox", "title": "Acquisition Trend", "x": 84, "y": 660, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_acquisition_trend", "visualType": "shape", "x": 84, "y": 684, "w": 1346, "h": 330, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_acquisition_trend", "visualType": "lineChart", "title": "Sessions by Channel Over Time", "x": 102, "y": 756, "w": 1310, "h": 230, "fields": {"xAxis": ["DimDate[Date]"], "yAxis": ["[Total Sessions]"], "legend": ["ga4-traffic-source[Session default channel group]"]}, "formatting": {"background": "transparent"}}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PlayEvents",
+      "displayName": "Play Events",
+      "layoutMode": "federal",
+      "activeIndicatorY": 324,
+      "background": {"color": "#F0F0F0"},
+      "sections": [
+        {
+          "type": "navigation",
+          "items": [
+            {"id": "active_indicator_p4", "visualType": "shape", "x": 0, "y": 324, "w": 4, "h": 60, "formatting": {"background": "#005EA2", "border": false}}
+          ]
+        },
+        {
+          "type": "header",
+          "items": [
+            {"id": "eyebrow_p4", "visualType": "textbox", "title": "HHS LIVE EVENTS", "x": 84, "y": 20, "w": 200, "h": 20, "formatting": {"fontSize": 11, "color": "#565C65"}},
+            {"id": "page_title_p4", "visualType": "textbox", "title": "Play Events", "x": 84, "y": 44, "w": 400, "h": 36, "formatting": {"fontSize": 24, "fontWeight": "semibold", "color": "#1B1B1B"}}
+          ]
+        },
+        {
+          "type": "kpi_row",
+          "y": 124,
+          "items": [
+            {"id": "kpi_total_plays", "visualType": "card", "x": 84, "y": 124, "w": 295, "h": 100, "title": "Total Play Events", "fields": {"values": ["[Total Play Events]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_unique_plays", "visualType": "card", "x": 391, "y": 124, "w": 295, "h": 100, "title": "Unique Play Sessions", "fields": {"values": ["[Unique Play Sessions]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_play_rate", "visualType": "card", "x": 698, "y": 124, "w": 295, "h": 100, "title": "Play Rate", "fields": {"values": ["[Play Rate]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_avg_plays", "visualType": "card", "x": 1005, "y": 124, "w": 295, "h": 100, "title": "Avg Plays/Session", "fields": {"values": ["[Avg Plays Per Session]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_plays", "visualType": "textbox", "title": "Play Event Analysis", "x": 84, "y": 240, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_plays_left", "visualType": "shape", "x": 84, "y": 264, "w": 667, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_plays_by_livecast", "visualType": "barChart", "title": "Play Events by Livecast", "x": 102, "y": 336, "w": 631, "h": 281, "fields": {"yAxis": ["DimLivecast[Livecast Title]"], "xAxis": ["[Total Play Events]"]}, "formatting": {"background": "transparent"}},
+            {"id": "container_plays_right", "visualType": "shape", "x": 763, "y": 264, "w": 667, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_plays_by_device", "visualType": "donutChart", "title": "Play Events by Device", "x": 781, "y": 336, "w": 631, "h": 281, "fields": {"legend": ["DimDevice[Device Category]"], "values": ["[Total Play Events]"]}, "formatting": {"background": "transparent"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_plays_trend", "visualType": "textbox", "title": "Play Event Trend", "x": 84, "y": 660, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_plays_trend", "visualType": "shape", "x": 84, "y": 684, "w": 1346, "h": 330, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_plays_trend", "visualType": "lineChart", "title": "Play Events Over Time", "x": 102, "y": 756, "w": 1310, "h": 230, "fields": {"xAxis": ["DimDate[Date]"], "yAxis": ["[Total Play Events]"]}, "formatting": {"background": "transparent"}}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ExternalSearch",
+      "displayName": "External Search",
+      "layoutMode": "federal",
+      "activeIndicatorY": 404,
+      "background": {"color": "#F0F0F0"},
+      "sections": [
+        {
+          "type": "navigation",
+          "items": [
+            {"id": "active_indicator_p5", "visualType": "shape", "x": 0, "y": 404, "w": 4, "h": 60, "formatting": {"background": "#005EA2", "border": false}}
+          ]
+        },
+        {
+          "type": "header",
+          "items": [
+            {"id": "eyebrow_p5", "visualType": "textbox", "title": "HHS LIVE EVENTS", "x": 84, "y": 20, "w": 200, "h": 20, "formatting": {"fontSize": 11, "color": "#565C65"}},
+            {"id": "page_title_p5", "visualType": "textbox", "title": "External Search", "x": 84, "y": 44, "w": 400, "h": 36, "formatting": {"fontSize": 24, "fontWeight": "semibold", "color": "#1B1B1B"}}
+          ]
+        },
+        {
+          "type": "kpi_row",
+          "y": 124,
+          "items": [
+            {"id": "kpi_impressions", "visualType": "card", "x": 84, "y": 124, "w": 295, "h": 100, "title": "Total Impressions", "fields": {"values": ["[Total Impressions]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_clicks", "visualType": "card", "x": 391, "y": 124, "w": 295, "h": 100, "title": "Total Clicks", "fields": {"values": ["[Total Clicks]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_ctr", "visualType": "card", "x": 698, "y": 124, "w": 295, "h": 100, "title": "CTR", "fields": {"values": ["[CTR]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "kpi_position", "visualType": "card", "x": 1005, "y": 124, "w": 295, "h": 100, "title": "Avg Position", "fields": {"values": ["[Avg Position]"]}, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_search", "visualType": "textbox", "title": "Search Performance", "x": 84, "y": 240, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_search_left", "visualType": "shape", "x": 84, "y": 264, "w": 667, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_top_queries", "visualType": "barChart", "title": "Top Search Queries", "x": 102, "y": 336, "w": 631, "h": 281, "fields": {"yAxis": ["gsc-queries[Query]"], "xAxis": ["[Total Clicks]"]}, "formatting": {"background": "transparent"}},
+            {"id": "container_search_right", "visualType": "shape", "x": 763, "y": 264, "w": 667, "h": 381, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_top_pages", "visualType": "barChart", "title": "Top Landing Pages", "x": 781, "y": 336, "w": 631, "h": 281, "fields": {"yAxis": ["gsc-pages[Page]"], "xAxis": ["[Total Clicks]"]}, "formatting": {"background": "transparent"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_search_trend", "visualType": "textbox", "title": "Search Trend", "x": 84, "y": 660, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_search_trend", "visualType": "shape", "x": 84, "y": 684, "w": 1346, "h": 330, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_search_trend", "visualType": "lineChart", "title": "Clicks & Impressions Over Time", "x": 102, "y": 756, "w": 1310, "h": 230, "fields": {"xAxis": ["gsc-chart[Date]"], "yAxis": ["[Total Clicks]", "[Total Impressions]"]}, "formatting": {"background": "transparent"}}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AIInsights",
+      "displayName": "AI Insights",
+      "layoutMode": "federal",
+      "activeIndicatorY": 484,
+      "background": {"color": "#F0F0F0"},
+      "sections": [
+        {
+          "type": "navigation",
+          "items": [
+            {"id": "active_indicator_p6", "visualType": "shape", "x": 0, "y": 484, "w": 4, "h": 60, "formatting": {"background": "#005EA2", "border": false}}
+          ]
+        },
+        {
+          "type": "header",
+          "items": [
+            {"id": "eyebrow_p6", "visualType": "textbox", "title": "HHS LIVE EVENTS", "x": 84, "y": 20, "w": 200, "h": 20, "formatting": {"fontSize": 11, "color": "#565C65"}},
+            {"id": "page_title_p6", "visualType": "textbox", "title": "AI Insights", "x": 84, "y": 44, "w": 400, "h": 36, "formatting": {"fontSize": 24, "fontWeight": "semibold", "color": "#1B1B1B"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_ai", "visualType": "textbox", "title": "Key Influencers Analysis", "x": 84, "y": 124, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_key_influencers", "visualType": "shape", "x": 84, "y": 152, "w": 1346, "h": 420, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "visual_key_influencers", "visualType": "keyInfluencersVisual", "title": "What influences Total Sessions?", "x": 102, "y": 224, "w": 1310, "h": 320, "fields": {"analyze": ["[Total Sessions]"], "explainBy": ["DimDevice[Device Category]", "ga4-traffic-source[Session default channel group]", "DimGeography[Region]"]}, "formatting": {"background": "transparent"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_decomp", "visualType": "textbox", "title": "Decomposition Analysis", "x": 84, "y": 588, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_decomposition", "visualType": "shape", "x": 84, "y": 616, "w": 1346, "h": 398, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "visual_decomposition", "visualType": "decompositionTreeVisual", "title": "Session Breakdown", "x": 102, "y": 688, "w": 1310, "h": 298, "fields": {"analyze": ["[Total Sessions]"], "explainBy": ["ga4-traffic-source[Session default channel group]", "DimDevice[Device Category]", "DimGeography[Region]"]}, "formatting": {"background": "transparent"}}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DeepDive",
+      "displayName": "Deep Dive",
+      "layoutMode": "federal",
+      "activeIndicatorY": 564,
+      "background": {"color": "#F0F0F0"},
+      "sections": [
+        {
+          "type": "navigation",
+          "items": [
+            {"id": "active_indicator_p7", "visualType": "shape", "x": 0, "y": 564, "w": 4, "h": 60, "formatting": {"background": "#005EA2", "border": false}}
+          ]
+        },
+        {
+          "type": "header",
+          "items": [
+            {"id": "eyebrow_p7", "visualType": "textbox", "title": "HHS LIVE EVENTS", "x": 84, "y": 20, "w": 200, "h": 20, "formatting": {"fontSize": 11, "color": "#565C65"}},
+            {"id": "page_title_p7", "visualType": "textbox", "title": "Deep Dive", "x": 84, "y": 44, "w": 400, "h": 36, "formatting": {"fontSize": 24, "fontWeight": "semibold", "color": "#1B1B1B"}}
+          ]
+        },
+        {
+          "type": "slicer_panel",
+          "items": [
+            {"id": "slicer_dd_livecast", "visualType": "slicer", "title": "Livecast", "x": 84, "y": 124, "w": 200, "h": 50, "fields": {"values": ["DimLivecast[Livecast Title]"]}, "formatting": {"slicerType": "dropdown"}},
+            {"id": "slicer_dd_device", "visualType": "slicer", "title": "Device", "x": 296, "y": 124, "w": 150, "h": 50, "fields": {"values": ["DimDevice[Device Category]"]}, "formatting": {"slicerType": "dropdown"}},
+            {"id": "slicer_dd_channel", "visualType": "slicer", "title": "Channel", "x": 458, "y": 124, "w": 200, "h": 50, "fields": {"values": ["ga4-traffic-source[Session default channel group]"]}, "formatting": {"slicerType": "dropdown"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_matrix", "visualType": "textbox", "title": "Detailed Analysis", "x": 84, "y": 190, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_matrix", "visualType": "shape", "x": 84, "y": 218, "w": 1346, "h": 450, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "matrix_detail", "visualType": "matrix", "title": "Performance Matrix", "x": 102, "y": 290, "w": 1310, "h": 350, "fields": {"rows": ["DimLivecast[Livecast Title]", "ga4-traffic-source[Session default channel group]"], "columns": ["DimDevice[Device Category]"], "values": ["[Total Sessions]", "[Total Page Views]", "[Avg Session Duration]"]}, "formatting": {"background": "transparent"}}
+          ]
+        },
+        {
+          "type": "chart_area",
+          "items": [
+            {"id": "section_header_detail_trend", "visualType": "textbox", "title": "Filtered Trend", "x": 84, "y": 684, "w": 400, "h": 28, "formatting": {"fontSize": 14, "fontWeight": "semibold", "color": "#1B1B1B"}},
+            {"id": "container_detail_trend", "visualType": "shape", "x": 84, "y": 712, "w": 1346, "h": 302, "formatting": {"background": "#FFFFFF", "border": true, "borderColor": "#DFE1E2", "borderRadius": 4}},
+            {"id": "chart_detail_trend", "visualType": "lineChart", "title": "Sessions Trend (Filtered)", "x": 102, "y": 784, "w": 1310, "h": 202, "fields": {"xAxis": ["DimDate[Date]"], "yAxis": ["[Total Sessions]"]}, "formatting": {"background": "transparent"}}
+          ]
+        }
+      ]
+    }
+  ],
+
+  "bookmarks": [
+    {
+      "name": "Actions_Expanded",
+      "displayName": "Actions Expanded",
+      "options": {
+        "display": true,
+        "data": false,
+        "currentPage": true
+      },
+      "visibleElements": ["actions_panel_container", "actions_accent_bar", "actions_title", "action_card_1", "action_card_2", "action_card_3", "actions_disclaimer", "collapse_button"],
+      "hiddenElements": ["expand_button"]
+    },
+    {
+      "name": "Actions_Collapsed",
+      "displayName": "Actions Collapsed",
+      "options": {
+        "display": true,
+        "data": false,
+        "currentPage": true
+      },
+      "visibleElements": ["expand_button"],
+      "hiddenElements": ["actions_panel_container", "actions_accent_bar", "actions_title", "action_card_1", "action_card_2", "action_card_3", "actions_disclaimer", "collapse_button"]
+    }
+  ]
+}
